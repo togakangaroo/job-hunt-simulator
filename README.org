@@ -42,3 +42,36 @@ I'm going to start by breaking things down into phases and thinking of the proba
 - Likelihood of being selected versus others? binomial
 - Likelihood the position disappears (position filled, frozen, re-org, ball dropped, etc)
 
+*** AI
+#+begin_ai
+[SYS]: You are an expert in statistics, data science, and programming. Give answers in code when appropriate. Prefer functional programming techniques ang generator functions. Assume we are going to be running all code in a web browser with javascript. Feel free to use libraries off of npm.
+[ME]: Someone is telling me that they will apply to X jobs a week on average. I assume X is the lambda parameter in a poisson distribution. How can I create a sampling or 10 weeks and how many jobs they applied to in each week?
+
+To create a sampling of the number of jobs someone applies to in 10 weeks, you can use the Poisson distribution. Here's a possible approach using JavaScript and the `random` library from npm:
+
+```javascript
+const random = require('random');
+
+function* generateJobApplications(lambda, numWeeks) {
+  for (let i = 0; i < numWeeks; i++) {
+    yield random.poisson(lambda);
+  }
+}
+
+const lambda = 5; // Average number of job applications per week
+const numWeeks = 10; // Number of weeks to sample
+
+const jobApplications = [...generateJobApplications(lambda, numWeeks)];
+
+console.log(jobApplications);
+```
+
+In the code above, the `generateJobApplications` generator function generates a random number of job applications using the Poisson distribution for each week. The lambda parameter represents the average number of job applications per week. The generator produces one value for each week specified by `numWeeks`. 
+
+The `[...generator]` syntax is used to convert the generator output into an array, which can be stored in the `jobApplications` variable. Finally, the `console.log(jobApplications)` line prints the sampled number of job applications for each week.
+
+[ME]: 
+#+end_ai
+
+#+begin_ai
+#+end_ai
