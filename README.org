@@ -19,7 +19,7 @@ I'm going to start by breaking things down into phases and thinking of the proba
 *** Selection
 - Likelihood this position is not real, has been paused, or no one is monitoring it? Normal
 - How many applicants per period will a given job recieve? Poisson distribution
-- Percentile compared to other resumes for this job your resume falls into? Binomial
+- The resume is a better fit for the role than X% other resumes? Normal
 - Amount per period that will be passed through to next stage
 
 *** Screening
@@ -75,13 +75,4 @@ The `[...generator]` syntax is used to convert the generator output into an arra
 #+end_ai
 
 #+begin_ai
-In javascript, if I have a generator function
-```
-const foo = function * () {
-   yield "a"
-   yield "b"
-   return "done"
-}
-```
-
 #+end_ai
