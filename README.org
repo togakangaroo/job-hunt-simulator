@@ -1,0 +1,44 @@
+#+TITLE: Job Hunt Simpulator
+
+A very simple job hunt simulator to pair with a talk I'm giving on the same subject.
+
+* Brainstorming
+We're going to break down the job hunt into multiple steps and preform a very basic monte carlo simulation to demonstrate the relative value of where to invest your time at improving.
+
+I'm going to start by breaking things down into phases and thinking of the probabilities as independent of each other. This begs the question of why do a simulation at all versus just multiplying through the probabilities? I am thinking of the following
+- I want to give people an instinct for how the various values affect thigns. I want it to be interactive and it should feel "real". Reporting the exact same value each time wouldn't do this.
+- I want to be able to think about variances and potentially even non-normal distribution types as well
+- I'm only starting with independent distributions. I could imagine introducing dependent variables, I just am not yet.
+
+** Stages
+
+*** Applying
+- How many jobs a period are you applying to? Poisson distribution
+- How likely are you to take a period off? Binomial
+
+*** Selection
+- Likelihood this position is not real, has been paused, or no one is monitoring it? Normal
+- How many applicants per period will a given job recieve? Poisson distribution
+- Percentile compared to other resumes for this job your resume falls into? Binomial
+- Amount per period that will be passed through to next stage
+
+*** Screening
+- Likelihood to pass the screening step? Normal
+- Likelihood the position disappears (position filled, frozen, re-org, ball dropped, etc)
+
+*** Interview 1
+- Likelihood to pass the interviewing step? Normal
+- Likelihood the position disappears (position filled, frozen, re-org, ball dropped, etc)
+
+*** Interview 2
+- Likelihood to pass the interviewing step? Normal
+- Likelihood the position disappears (position filled, frozen, re-org, ball dropped, etc)
+
+*** Interview 3
+- Likelihood to pass the interviewing step? Normal
+- Likelihood the position disappears (position filled, frozen, re-org, ball dropped, etc)
+
+*** Offer
+- Likelihood of being selected versus others? binomial
+- Likelihood the position disappears (position filled, frozen, re-org, ball dropped, etc)
+
