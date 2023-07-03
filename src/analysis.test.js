@@ -28,7 +28,7 @@ const singleJobApplication = function* ({
       )
     // select the number of people who applied and the number that are going to progress
     const barForResumeSelection = 1 - (1.0 * apply_numberOfApplicantsToMoveOn()) / apply_numberOfApplicants()
-    // consider if the applicant's resume is selected in that number
+    // cdonsider if the applicant's resume is selected in that number
     const quality = apply_resumeQuality()
     if (quality < barForResumeSelection) return singleJobApplicationResult(unsuccessfulOutcome, `Resume was not selected for stage 2`)
   }
@@ -66,34 +66,65 @@ const singleJobApplication = function* ({
   return singleJobApplicationResult(successfulOutcome, `Its a good offer. Congratulations.`)
 }
 
-describe(`run simulation`, () => {
-  // it(`generates poison values`, () => {
-  //   const getVal = random.poisson(35)
-  //   console.log(`poisson: `, Array(10).fill(0).map(getVal))
-  // })
-
-  // it(`generates binomial values`, () => {
-  //   const getVal = random.binomial(10, 0.1)
-  //   console.log(`binomial: `, Array(10).fill(0).map(getVal))
-  // })
-
-  it(`running single job application simulation yields next steps until done`, () => {
-    const jobApplicationParameters = {
-      apply_jobIsReal: random.binomial(1, 0.8),
-      apply_numberOfApplicants: random.poisson(20),
-      apply_numberOfApplicantsToMoveOn: random.poisson(5),
-      apply_resumeQuality: random.normal(0.7, 0.1),
-      general_position_disappears: random.binomial(1, 0.05), // will be tested multiple times
-      screening_failPhoneScreen: random.binomial(1, 0.5),
-      interview1_passed: random.binomial(1, 0.6),
-      interview2_passed: random.binomial(1, 0.3),
-      interview3_passed: random.binomial(1, 0.7),
-      offer_offerReceivedVersusOthers: random.binomial(1, 0.5),
+const jobHuntSimulation = function* ({ numberOfApplicationsPerPeriod, takingAPeriodBreak }, jobApplicationParameters) {
+  const currentApplications = new Set()
+  while (true) {
+    const unsuccessful = new Set()
+    const offers = new Set()
+    const stageCounts = new Map()
+    for (const application of currentApplications) {
+      const { done, value } = application.next()
+      if (done) {
+        currentApplications.delete(application)
+        if (value.result === successfulOutcome) offers.add(application)
+        else unsuccessful.add(application)
+      } else stageCounts.set(value.stage, stageCounts.get(value.stage) || 0 + 1)
+    }
+    if (!takingAPeriodBreak()) {
+      const newApplicationCount = numberOfApplicationsPerPeriod()
+      stageCounts.set(0, newApplicationCount)
+      for (const newApplication of Array(newApplicationCount)
+        .fill(0)
+        .map(() => singleJobApplication(jobApplicationParameters)))
+        currentApplications.add(newApplication)
     }
 
+    yield { unsuccessful, offers, stageCounts }
+  }
+}
+
+describe(`run simulation`, () => {
+  const jobApplicationParameters = {
+    apply_jobIsReal: random.binomial(1, 0.8),
+    apply_numberOfApplicants: random.poisson(20),
+    apply_numberOfApplicantsToMoveOn: random.poisson(5),
+    apply_resumeQuality: random.normal(0.7, 0.1),
+    general_position_disappears: random.binomial(1, 0.05), // will be tested multiple times
+    screening_failPhoneScreen: random.binomial(1, 0.5),
+    interview1_passed: random.binomial(1, 0.6),
+    interview2_passed: random.binomial(1, 0.3),
+    interview3_passed: random.binomial(1, 0.7),
+    offer_offerReceivedVersusOthers: random.binomial(1, 0.5),
+  }
+
+  it(`running single job application simulation yields next steps until done`, () => {
     const process = singleJobApplication(jobApplicationParameters)
     let val = null
     while (!(val = process.next()).done) console.log("> ", val.value)
     console.log(`RESULT`, val.value)
+  })
+
+  it(`running through a set of simulations`, () => {
+    const jobHuntStrategyParameters = {
+      numberOfApplicationsPerPeriod: random.poisson(25),
+      takingAPeriodBreak: random.binomial(1, 0.125),
+    }
+
+    let i = 0
+    for (const { stageCounts, offers, unsuccessful } of jobHuntSimulation(jobHuntStrategyParameters, jobApplicationParameters)) {
+      console.log(`WEEK`, i, `REJECTED`, unsuccessful.size, `STAGES`, stageCounts, `OFFERS`, offers.size)
+      if (offers.size) return
+      i += 1
+    }
   })
 })
