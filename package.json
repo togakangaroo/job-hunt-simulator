@@ -13,6 +13,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "build": "react-scripts build",
     "test": "mocha --require @babel/register './src/**/*.test.js'",
     "eject": "react-scripts eject"
@@ -50,6 +52,7 @@
   },
   "devDependencies": {
     "@babel/register": "^7.22.5",
+    "gh-pages": "^5.0.0",
     "mocha": "^10.2.0"
   }
 }
