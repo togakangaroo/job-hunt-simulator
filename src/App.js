@@ -187,8 +187,8 @@ const SingleRunSimulation = ({ parameters }) => {
   )
 }
 
+const simulationCount = 1000
 const SimulationRun = ({ parameters }) => {
-  const simulationCount = 1000
   const [simulationResults, setSimulationResults] = useState(null)
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -246,23 +246,30 @@ export const App = () => {
   )
   return (
     <article className="App">
-      <ul>
-        {Object.entries(simulationParameters).map(([name, args]) => {
-          const { component, description, componentArgs } = simulationParametersConfig[name]
-          return (
-            <li key={name}>
-              {createElement(component, {
-                name,
-                description,
-                onChange: (x) => setSimulationParmeters({ [name]: x }),
-                ...(componentArgs || {}),
-                ...args,
-              })}
-            </li>
-          )
-        })}
-      </ul>
-      <section className="results">
+      <p className="simulation-description">
+        Here is a basic simulation of a job hunt. Given the parameters you set on the left, it is run {simulationCount} times. On the right you see
+        the results of running simulations and a {period}ly log of a sample simulation. Note that the purpose is not so much for accurate estimates,
+        so much as to give you a feel for how best to invest your time.
+      </p>
+      <section className="parameter-configuration">
+        <ul>
+          {Object.entries(simulationParameters).map(([name, args]) => {
+            const { component, description, componentArgs } = simulationParametersConfig[name]
+            return (
+              <li key={name}>
+                {createElement(component, {
+                  name,
+                  description,
+                  onChange: (x) => setSimulationParmeters({ [name]: x }),
+                  ...(componentArgs || {}),
+                  ...args,
+                })}
+              </li>
+            )
+          })}
+        </ul>
+      </section>
+      <section className="simulation-results">
         <SimulationRun parameters={simulationRunParameters} />
         <SingleRunSimulation parameters={simulationRunParameters} />
       </section>

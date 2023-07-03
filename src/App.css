@@ -1,12 +1,23 @@
 .App {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        " header      header    "
+        " parameters  simulation";
     grid-gap: 20px;
     height: 100vh;
 }
-.App > * {
+.simulation-description {
+    grid-area: header;
+}
+.parameter-configuration {
+    grid-area: parameters;
     overflow-y: auto;
 }
+.simulation-results {
+    grid-area: simulation;
+    overflow-y: auto;
+}
+
 ul {
     margin: 0;
     padding: 0;
