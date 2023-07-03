@@ -5,6 +5,22 @@ const compose =
   (x) =>
     fns.reduce((prev, fn) => fn(prev), x)
 
+const sum = (vals) => {
+  let result = 0
+  for (const v of vals) result += v
+  return result
+}
+
+const mean = (vals) => {
+  let sum = 0
+  let count = 0
+  for (const v of vals) {
+    sum += v
+    count += 1
+  }
+  return sum / count
+}
+
 const unsuccessfulOutcome = Symbol(`Job application outcome - unsuccessful`)
 const successfulOutcome = Symbol(`Job application outcome - successful`)
 
@@ -30,44 +46,44 @@ const singleJobApplication = function* ({
     if (!apply_jobIsReal())
       return singleJobApplicationResult(
         unsuccessfulOutcome,
-        `The listing was either not real or the company dropped the ball with reviewing applicants`
+        `1: The listing was either not real or the company dropped the ball with reviewing applicants`
       )
     // select the number of people who applied and the number that are going to progress
     const barForResumeSelection = 1 - (1.0 * apply_numberOfApplicantsToMoveOn()) / apply_numberOfApplicants()
     // cdonsider if the applicant's resume is selected in that number
     const quality = apply_resumeQuality()
-    if (quality < barForResumeSelection) return singleJobApplicationResult(unsuccessfulOutcome, `Resume was not selected for stage 2`)
+    if (quality < barForResumeSelection) return singleJobApplicationResult(unsuccessfulOutcome, `1: Resume was not selected for stage 2`)
   }
   {
     yield atStage(2, `Phone screen`)
     if (general_position_disappears())
-      return singleJobApplicationResult(unsuccessfulOutcome, `The job has disappeared, been frozen, or the hiring pipeline broke.`)
-    if (screening_failPhoneScreen()) return singleJobApplicationResult(unsuccessfulOutcome, `Failed the job screen`)
+      return singleJobApplicationResult(unsuccessfulOutcome, `2: The job has disappeared, been frozen, or the hiring pipeline broke.`)
+    if (screening_failPhoneScreen()) return singleJobApplicationResult(unsuccessfulOutcome, `2: Failed the job screen`)
   }
   {
     yield atStage(3, `Iterview 1`)
     if (general_position_disappears())
-      return singleJobApplicationResult(unsuccessfulOutcome, `The job has disappeared, been frozen, or the hiring pipeline broke.`)
-    if (!interview1_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `Eliminated in first interview round`)
+      return singleJobApplicationResult(unsuccessfulOutcome, `3: The job has disappeared, been frozen, or the hiring pipeline broke.`)
+    if (!interview1_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `3: Eliminated in first interview round`)
   }
   {
     yield atStage(4, `Iterview 2`)
     if (general_position_disappears())
-      return singleJobApplicationResult(unsuccessfulOutcome, `The job has disappeared, been frozen, or the hiring pipeline broke.`)
-    if (!interview2_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `Eliminated in second interview round`)
+      return singleJobApplicationResult(unsuccessfulOutcome, `4: The job has disappeared, been frozen, or the hiring pipeline broke.`)
+    if (!interview2_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `4: Eliminated in second interview round`)
   }
   {
     yield atStage(5, `Iterview 3`)
     if (general_position_disappears())
-      return singleJobApplicationResult(unsuccessfulOutcome, `The job has disappeared, been frozen, or the hiring pipeline broke.`)
-    if (!interview3_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `Eliminated in third interview round`)
+      return singleJobApplicationResult(unsuccessfulOutcome, `5: The job has disappeared, been frozen, or the hiring pipeline broke.`)
+    if (!interview3_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `5: Eliminated in third interview round`)
   }
   {
     yield atStage(6, `Offer`)
     if (general_position_disappears())
-      return singleJobApplicationResult(unsuccessfulOutcome, `The job has disappeared, been frozen, or the hiring pipeline broke.`)
-    if (!offer_offerReceivedVersusOthers()) return singleJobApplicationResult(unsuccessfulOutcome, `The offer went to a better fitting candidate`)
-    if (!offer_isGood()) return singleJobApplicationResult(unsuccessfulOutcome, `Received an offer, but a bad one`)
+      return singleJobApplicationResult(unsuccessfulOutcome, `6: The job has disappeared, been frozen, or the hiring pipeline broke.`)
+    if (!offer_offerReceivedVersusOthers()) return singleJobApplicationResult(unsuccessfulOutcome, `6: The offer went to a better fitting candidate`)
+    if (!offer_isGood()) return singleJobApplicationResult(unsuccessfulOutcome, `6: Received an offer, but a bad one`)
   }
 
   return singleJobApplicationResult(successfulOutcome, `Its a good offer. Congratulations.`)
@@ -94,8 +110,8 @@ const jobHuntSimulation = function* (
       if (done) {
         currentApplicationStages.delete(application)
         if (value.result === successfulOutcome) offers.add(application)
-        else unsuccessful.add(application)
-      } else stageCounts.set(value.stage, stageCounts.get(value.stage) || 0 + 1)
+        else unsuccessful.add(value)
+      } else stageCounts.set(value.stage, (stageCounts.get(value.stage) || 0) + 1)
     }
     if (!takingAPeriodBreak()) {
       const newApplicationCount = numberOfApplicationsPerPeriod()
@@ -121,6 +137,13 @@ describe(`run simulation`, () => {
     offer_isGood: random.binomial(1, 0.8),
     general_position_disappears: random.binomial(1, 0.05), // will be tested multiple times
   }
+  const jobHuntStrategyParameters = {
+    numberOfApplicationsPerPeriod: random.poisson(25),
+    takingAPeriodBreak: random.binomial(1, 0.125),
+    periodsForCompanyToMoveIntoNextStage: compose(random.poisson(1), (x) => x + 1),
+  }
+
+  const runSimulation = () => jobHuntSimulation(jobHuntStrategyParameters, () => singleJobApplication(jobApplicationParameters))
 
   it(`running single job application simulation yields next steps until done`, () => {
     const process = singleJobApplication(jobApplicationParameters)
@@ -130,19 +153,44 @@ describe(`run simulation`, () => {
   })
 
   it(`running through a set of simulations`, () => {
-    const jobHuntStrategyParameters = {
-      numberOfApplicationsPerPeriod: random.poisson(25),
-      takingAPeriodBreak: random.binomial(1, 0.125),
-      periodsForCompanyToMoveIntoNextStage: compose(random.poisson(1), (x) => x + 1),
-    }
-
     let i = 0
-    for (const { stageCounts, offers, unsuccessful } of jobHuntSimulation(jobHuntStrategyParameters, () =>
-      singleJobApplication(jobApplicationParameters)
-    )) {
+    for (const { stageCounts, offers, unsuccessful } of runSimulation()) {
       console.log(`WEEK`, i, `REJECTED`, unsuccessful.size, `STAGES`, stageCounts, `OFFERS`, offers.size)
       if (offers.size) return
       i += 1
     }
+  })
+
+  const runSimulationChains = function* (simulationCount) {
+    for (let i = 0; i < simulationCount; i += 1) {
+      const unsuccesfulCountsByReason = new Map()
+      let periodsToOffer = 0
+      for (const { stageCounts, offers, unsuccessful } of runSimulation()) {
+        for (const { reason } of unsuccessful) unsuccesfulCountsByReason.set(reason, (unsuccesfulCountsByReason.get(reason) || 0) + 1)
+        if (offers.size) {
+          const totalApplications = offers.size + sum(unsuccesfulCountsByReason.values()) + sum(stageCounts.values())
+          yield { periodsToOffer, unsuccesfulCountsByReason, stageCounts, totalApplications }
+          break
+        }
+        periodsToOffer += 1
+      }
+    }
+  }
+
+  it(`running through several simulation chains and averaging`, () => {
+    const simulationCount = 100
+    const simulationResults = Array.from(runSimulationChains(simulationCount))
+    const meanPeriodsToOffer = mean(simulationResults.map((x) => x.periodsToOffer))
+    const meanTotalApplications = mean(simulationResults.map((x) => x.totalApplications))
+    const allRejectionReasons = new Set(simulationResults.map((x) => x.unsuccesfulCountsByReason.keys()).flatMap((x) => Array.from(x)))
+    const meanRejectionsByReason = new Map(
+      Array.from(allRejectionReasons.values()).map((reason) => [
+        reason,
+        mean(simulationResults.map((x) => x.unsuccesfulCountsByReason.get(reason) || 0)),
+      ])
+    )
+    console.log(`Mean rejection counts`, meanRejectionsByReason)
+    console.log(`Mean total applications`, meanTotalApplications)
+    console.log(`Mean periods to offer`, meanPeriodsToOffer)
   })
 })
