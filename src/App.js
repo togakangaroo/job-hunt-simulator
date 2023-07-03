@@ -6,10 +6,10 @@ import "./App.css"
 const BinomialParameter = ({ name, value, onChange, description }) => (
   <section>
     <header>
-      <p>{description}</p>
+      <p>{name}</p>
     </header>
     <label>
-      <div className="label">{name}</div>
+      <div className="label">{description}</div>
       <input type="range" value={value} onChange={(e) => onChange({ value: parseFloat(e.target.value) })} min={0.05} max={0.95} step={0.05} />
       <input readOnly value={value} /> (Likelihood of success)
     </label>
@@ -19,10 +19,10 @@ const BinomialParameter = ({ name, value, onChange, description }) => (
 const PoissonParameter = ({ name, value, onChange, description, max, min = 1, step = 1 }) => (
   <section>
     <header>
-      <p>{description}</p>
+      <p>{name}</p>
     </header>
     <label>
-      <div className="label">{name}</div>
+      <div className="label">{description}</div>
       <input type="range" value={value} onChange={(e) => onChange({ value: parseFloat(e.target.value) })} min={min} max={max} step={step} />
       <input readOnly value={value} /> (λ parameter in a Poisson distribution)
     </label>
@@ -32,10 +32,10 @@ const PoissonParameter = ({ name, value, onChange, description, max, min = 1, st
 const ConstantParameter = ({ name, value, onChange, description, max, min = 1, step = 1 }) => (
   <section>
     <header>
-      <p>{description}</p>
+      <p>{name}</p>
     </header>
     <label>
-      <div className="label">{name}</div>
+      <div className="label">{description}</div>
       <input type="range" value={value} onChange={(e) => onChange({ value: parseFloat(e.target.value) })} min={min} max={max} step={step} />
       <input readOnly value={value} />
     </label>
@@ -44,10 +44,8 @@ const ConstantParameter = ({ name, value, onChange, description, max, min = 1, s
 
 const NormalParameter = ({ name, onChange, mean, stddev, description }) => (
   <section>
-    <header>
-      {name}
-      <p>{description}</p>
-    </header>
+    <header>{name}</header>
+    <p>{description}</p>
     <label>
       <div className="label">{name} - Mean</div>
       <input type="range" value={mean} onChange={(e) => onChange({ mean: parseFloat(e.target.value), stddev })} min={0.05} max={0.95} step={0.05} />
@@ -172,12 +170,16 @@ const SingleRunSimulation = ({ parameters }) => {
         {periods.map(({ unsuccessful, newApplicationCount, stageCounts }, period) => (
           <li key={period}>
             <header>Week {period}:</header>
-            <p>Applied to: {newApplicationCount}</p>
-            <p>Rejected from: {unsuccessful.size}</p>
-            <p>
-              In flight status:
-              <pre>{JSON.stringify(Object.fromEntries(stageCounts.entries()))}</pre>
-            </p>
+            <dl>
+              <dd>Applied</dd>
+              <dt>{newApplicationCount} jobs</dt>
+              <dd>Rejected</dd>
+              <dt>{unsuccessful.size}</dt>
+              <dd>In flight status:</dd>
+              <dt>
+                <pre>{JSON.stringify(Object.fromEntries(stageCounts.entries()))}</pre>
+              </dt>
+            </dl>
           </li>
         ))}
       </ul>
@@ -209,7 +211,7 @@ const SimulationRun = ({ parameters }) => {
     <article className="simulation-run">
       <header>Simulation Results</header>
       {!simulationResults ? null : (
-        <dl>
+        <dl className="simulation-results">
           <dd>Mean {period}s in job hunt</dd>
           <dt>{simulationResults.meanPeriodsToEnd}</dt>
           <dd>Mean total applications</dd>
@@ -218,7 +220,7 @@ const SimulationRun = ({ parameters }) => {
           <dt>{simulationResults.meanTotalOffers}</dt>
           <dd>Mean Rejections by Reason</dd>
           <dt>
-            <dl>
+            <dl className="simulation-rejections-by-reason">
               {simulationResults.meanRejectionsByReason.map(([reason, count]) => (
                 <React.Fragment key={reason}>
                   <dd>{reason}</dd>
