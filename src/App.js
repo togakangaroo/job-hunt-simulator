@@ -29,6 +29,19 @@ const PoissonParameter = ({ name, value, onChange, description, max, min = 1, st
   </section>
 )
 
+const ConstantParameter = ({ name, value, onChange, description, max, min = 1, step = 1 }) => (
+  <section>
+    <header>
+      <p>{description}</p>
+    </header>
+    <label>
+      <div className="label">{name}</div>
+      <input type="range" value={value} onChange={(e) => onChange({ value: parseFloat(e.target.value) })} min={min} max={max} step={step} />
+      <input readOnly value={value} />
+    </label>
+  </section>
+)
+
 const NormalParameter = ({ name, onChange, mean, stddev, description }) => (
   <section>
     <header>
@@ -66,7 +79,13 @@ const simulationParametersConfig = {
     componentArgs: { min: 1, max: 100 },
     description: `How many applicants per ${period} are you comitting to make?`,
   },
-
+  desiredOfferCount: {
+    fn: (x) => () => x.value,
+    component: ConstantParameter,
+    defaultArgs: { value: 1 },
+    componentArgs: { min: 1, max: 10, step: 1 },
+    description: `How many offers are you holding out for?`,
+  },
   takingAPeriodBreak: {
     ...binomialParameter,
     defaultArgs: { value: 0.125 },

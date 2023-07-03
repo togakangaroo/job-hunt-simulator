@@ -126,7 +126,7 @@ export const jobHuntSimulation = function* ({ numberOfApplicationsPerPeriod, tak
 // Similar to jobHuntSimulation but stop the generator once the requisite number of offers is reached
 export const runSingleJobHuntSimulation = function* (jobHuntParameters, startJobApplication) {
   let offerCount = 0
-  const desiredOfferCount = jobHuntParameters.desiredOfferCount || 1
+  const desiredOfferCount = jobHuntParameters.desiredOfferCount()
 
   for (const period of jobHuntSimulation(jobHuntParameters, startJobApplication)) {
     yield period
@@ -138,16 +138,17 @@ export const runSingleJobHuntSimulation = function* (jobHuntParameters, startJob
 export const runSimulationChains = function* (simulationCount, runSimulation) {
   for (let i = 0; i < simulationCount; i += 1) {
     const unsuccesfulCountsByReason = new Map()
-    let periodsToOffer = 0
+    let periods = 0
     let totalApplications = 0
+    let stageCountsAtEnd = {}
+    let allOffers = new Set()
     for (const { stageCounts, offers, unsuccessful, newApplicationCount } of runSimulation()) {
       for (const { reason } of unsuccessful) unsuccesfulCountsByReason.set(reason, (unsuccesfulCountsByReason.get(reason) || 0) + 1)
       totalApplications += newApplicationCount
-      if (offers.size) {
-        yield { periodsToOffer, unsuccesfulCountsByReason, stageCounts, totalApplications }
-        break
-      }
-      periodsToOffer += 1
+      periods += 1
+      stageCountsAtEnd = stageCounts
+      for (const o of offers) allOffers.add(o)
     }
+    yield { periods, unsuccesfulCountsByReason, stageCountsAtEnd, allOffers, totalApplications }
   }
 }

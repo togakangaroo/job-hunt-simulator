@@ -1,5 +1,5 @@
 import random from "random"
-import { compose, mean, jobHuntSimulation, singleJobApplication, runSimulationChains } from "./analysis.js"
+import { compose, mean, runSingleJobHuntSimulation, singleJobApplication, runSimulationChains } from "./analysis.js"
 
 //////////////////////////////
 // NOTE: These are not real tests so much as a basic simulation runner. There are no assertions here.
@@ -25,9 +25,10 @@ describe(`run simulation`, () => {
   const jobHuntStrategyParameters = {
     numberOfApplicationsPerPeriod: random.poisson(25),
     takingAPeriodBreak: random.binomial(1, 0.125),
+    desiredOfferCount: () => 1,
   }
 
-  const runSimulation = () => jobHuntSimulation(jobHuntStrategyParameters, () => singleJobApplication(jobApplicationParameters))
+  const runSimulation = () => runSingleJobHuntSimulation(jobHuntStrategyParameters, () => singleJobApplication(jobApplicationParameters))
 
   it(`running single job application simulation yields next steps until done`, () => {
     const process = singleJobApplication(jobApplicationParameters)
@@ -40,7 +41,6 @@ describe(`run simulation`, () => {
     let i = 0
     for (const { stageCounts, offers, unsuccessful } of runSimulation()) {
       console.log(`WEEK`, i, `REJECTED`, unsuccessful.size, `STAGES`, stageCounts, `OFFERS`, offers.size)
-      if (offers.size) return
       i += 1
     }
   })
@@ -48,15 +48,17 @@ describe(`run simulation`, () => {
   it(`running through several simulation chains and averaging`, () => {
     const simulationCount = 1000
     const simulationResults = Array.from(runSimulationChains(simulationCount, runSimulation))
-    const meanPeriodsToOffer = mean(simulationResults.map((x) => x.periodsToOffer))
+    const meanPeriodsToOffer = mean(simulationResults.map((x) => x.periods))
     const meanTotalApplications = mean(simulationResults.map((x) => x.totalApplications))
     const allRejectionReasons = new Set(simulationResults.map((x) => x.unsuccesfulCountsByReason.keys()).flatMap((x) => Array.from(x)))
+    const meanTotalOffers = mean(simulationResults.map((x) => x.allOffers.size))
     const meanRejectionsByReason = new Map(
       Array.from(allRejectionReasons.values()).map((reason) => [
         reason,
         mean(simulationResults.map((x) => x.unsuccesfulCountsByReason.get(reason) || 0)),
       ])
     )
+    console.log(`Mean offer counts`, meanTotalOffers)
     console.log(`Mean rejection counts`, meanRejectionsByReason)
     console.log(`Mean total applications`, meanTotalApplications)
     console.log(`Mean periods to offer`, meanPeriodsToOffer)
