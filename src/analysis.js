@@ -32,16 +32,19 @@ export const singleJobApplication = function* ({
   apply_numberOfApplicantsToMoveOn,
   apply_numberOfApplicants,
   apply_resumeQuality,
-  general_position_disappears,
-  screening_failPhoneScreen,
+  screening_phoneScreenPassed,
   interview1_passed,
   interview2_passed,
   interview3_passed,
   offer_offerReceivedVersusOthers,
   offer_isGood,
+  general_position_disappears,
+  general_periodsForCompanyToMoveIntoNextStage,
 }) {
+  const periodsPerStage = general_periodsForCompanyToMoveIntoNextStage()
   {
-    yield atStage(1, `Resume filtering`)
+    const stage = atStage(1, `Resume filtering`)
+    for(let i=0; i<periodsPerStage;i+=1) yield stage
     if (!apply_jobIsReal())
       return singleJobApplicationResult(
         unsuccessfulOutcome,
@@ -54,31 +57,36 @@ export const singleJobApplication = function* ({
     if (quality < barForResumeSelection) return singleJobApplicationResult(unsuccessfulOutcome, `1: Resume was not selected for stage 2`)
   }
   {
-    yield atStage(2, `Phone screen`)
+    const stage= atStage(2, `Phone screen`)
+    for(let i=0; i<periodsPerStage;i+=1) yield stage
     if (general_position_disappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `2: The job has disappeared, been frozen, or the hiring pipeline broke.`)
-    if (screening_failPhoneScreen()) return singleJobApplicationResult(unsuccessfulOutcome, `2: Failed the job screen`)
+    if (!screening_phoneScreenPassed()) return singleJobApplicationResult(unsuccessfulOutcome, `2: Failed the job screen`)
   }
   {
-    yield atStage(3, `Iterview 1`)
+    const stage = atStage(3, `Iterview 1`)
+    for(let i=0; i<periodsPerStage;i+=1) yield stage
     if (general_position_disappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `3: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!interview1_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `3: Eliminated in first interview round`)
   }
   {
-    yield atStage(4, `Iterview 2`)
+    const stage= atStage(4, `Iterview 2`)
+    for(let i=0; i<periodsPerStage;i+=1) yield stage
     if (general_position_disappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `4: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!interview2_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `4: Eliminated in second interview round`)
   }
   {
-    yield atStage(5, `Iterview 3`)
+    const stage= atStage(5, `Iterview 3`)
+    for(let i=0; i<periodsPerStage;i+=1) yield stage
     if (general_position_disappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `5: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!interview3_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `5: Eliminated in third interview round`)
   }
   {
-    yield atStage(6, `Offer`)
+    const stage= atStage(6, `Offer`)
+    for(let i=0; i<periodsPerStage;i+=1) yield stage
     if (general_position_disappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `6: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!offer_offerReceivedVersusOthers()) return singleJobApplicationResult(unsuccessfulOutcome, `6: The offer went to a better fitting candidate`)
@@ -93,20 +101,12 @@ export const jobHuntSimulation = function* (
   { numberOfApplicationsPerPeriod, takingAPeriodBreak, periodsForCompanyToMoveIntoNextStage },
   startJobApplication
 ) {
-  const applicationStage = (applicationIterator) => ({
-    periodsUntilNextStage: periodsForCompanyToMoveIntoNextStage(),
-    next: () => applicationIterator.next(),
-  })
   const currentApplicationStages = new Set()
   while (true) {
     const unsuccessful = new Set()
     const offers = new Set()
     const stageCounts = new Map()
     for (const application of currentApplicationStages) {
-      // TODO - this bit is overly complex, it can be pushed down into the single job simulation itself
-      application.periodsUntilNextStage -= 1
-      if (0 < application.periodsUntilNextStage) continue
-      application.periodsUntilNextStage = periodsForCompanyToMoveIntoNextStage()
       const { done, value } = application.next()
       if (done) {
         currentApplicationStages.delete(application)
@@ -117,7 +117,7 @@ export const jobHuntSimulation = function* (
     if (!takingAPeriodBreak()) {
       const newApplicationCount = numberOfApplicationsPerPeriod()
       stageCounts.set(0, newApplicationCount)
-      for (let i = 0; i < newApplicationCount; i += 1) currentApplicationStages.add(applicationStage(startJobApplication()))
+      for (let i = 0; i < newApplicationCount; i += 1) currentApplicationStages.add(startJobApplication())
     }
 
     yield { unsuccessful, offers, stageCounts }
