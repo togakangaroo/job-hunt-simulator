@@ -1,5 +1,10 @@
 import random from "random"
 
+const compose =
+  (...fns) =>
+  (x) =>
+    fns.reduce((prev, fn) => fn(prev), x)
+
 const unsuccessfulOutcome = Symbol(`Job application outcome - unsuccessful`)
 const successfulOutcome = Symbol(`Job application outcome - successful`)
 
@@ -68,16 +73,26 @@ const singleJobApplication = function* ({
   return singleJobApplicationResult(successfulOutcome, `Its a good offer. Congratulations.`)
 }
 
-const jobHuntSimulation = function* ({ numberOfApplicationsPerPeriod, takingAPeriodBreak }, jobApplicationParameters) {
-  const currentApplications = new Set()
+const jobHuntSimulation = function* (
+  { numberOfApplicationsPerPeriod, takingAPeriodBreak, periodsForCompanyToMoveIntoNextStage },
+  startJobApplication
+) {
+  const applicationStage = (applicationIterator) => ({
+    periodsUntilNextStage: periodsForCompanyToMoveIntoNextStage(),
+    next: () => applicationIterator.next(),
+  })
+  const currentApplicationStages = new Set()
   while (true) {
     const unsuccessful = new Set()
     const offers = new Set()
     const stageCounts = new Map()
-    for (const application of currentApplications) {
+    for (const application of currentApplicationStages) {
+      application.periodsUntilNextStage -= 1
+      if (0 < application.periodsUntilNextStage) continue
+      application.periodsUntilNextStage = periodsForCompanyToMoveIntoNextStage()
       const { done, value } = application.next()
       if (done) {
-        currentApplications.delete(application)
+        currentApplicationStages.delete(application)
         if (value.result === successfulOutcome) offers.add(application)
         else unsuccessful.add(application)
       } else stageCounts.set(value.stage, stageCounts.get(value.stage) || 0 + 1)
@@ -85,10 +100,7 @@ const jobHuntSimulation = function* ({ numberOfApplicationsPerPeriod, takingAPer
     if (!takingAPeriodBreak()) {
       const newApplicationCount = numberOfApplicationsPerPeriod()
       stageCounts.set(0, newApplicationCount)
-      for (const newApplication of Array(newApplicationCount)
-        .fill(0)
-        .map(() => singleJobApplication(jobApplicationParameters)))
-        currentApplications.add(newApplication)
+      for (let i = 0; i < newApplicationCount; i += 1) currentApplicationStages.add(applicationStage(startJobApplication()))
     }
 
     yield { unsuccessful, offers, stageCounts }
@@ -121,10 +133,13 @@ describe(`run simulation`, () => {
     const jobHuntStrategyParameters = {
       numberOfApplicationsPerPeriod: random.poisson(25),
       takingAPeriodBreak: random.binomial(1, 0.125),
+      periodsForCompanyToMoveIntoNextStage: compose(random.poisson(1), (x) => x + 1),
     }
 
     let i = 0
-    for (const { stageCounts, offers, unsuccessful } of jobHuntSimulation(jobHuntStrategyParameters, jobApplicationParameters)) {
+    for (const { stageCounts, offers, unsuccessful } of jobHuntSimulation(jobHuntStrategyParameters, () =>
+      singleJobApplication(jobApplicationParameters)
+    )) {
       console.log(`WEEK`, i, `REJECTED`, unsuccessful.size, `STAGES`, stageCounts, `OFFERS`, offers.size)
       if (offers.size) return
       i += 1

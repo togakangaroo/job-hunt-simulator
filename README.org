@@ -12,6 +12,8 @@ I'm going to start by breaking things down into phases and thinking of the proba
 
 ** Stages
 
+- Each company might take X amount of periods to move you onto the next stage. Poisson
+
 *** Applying
 - How many jobs a period are you applying to? Poisson distribution
 - How likely are you to take a period off? Binomial
