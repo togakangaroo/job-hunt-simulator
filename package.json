@@ -1,7 +1,6 @@
 {
   "name": "job-hunting-simulator",
   "version": "0.1.0",
-  "private": true,
   "dependencies": {
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -21,8 +20,7 @@
   "type": "module",
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ],
     "rules": {
       "semi": [
