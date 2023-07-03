@@ -44,7 +44,7 @@ export const singleJobApplication = function* ({
   const periodsPerStage = general_periodsForCompanyToMoveIntoNextStage()
   {
     const stage = atStage(1, `Resume filtering`)
-    for(let i=0; i<periodsPerStage;i+=1) yield stage
+    for (let i = 0; i < periodsPerStage; i += 1) yield stage
     if (!apply_jobIsReal())
       return singleJobApplicationResult(
         unsuccessfulOutcome,
@@ -57,36 +57,36 @@ export const singleJobApplication = function* ({
     if (quality < barForResumeSelection) return singleJobApplicationResult(unsuccessfulOutcome, `1: Resume was not selected for stage 2`)
   }
   {
-    const stage= atStage(2, `Phone screen`)
-    for(let i=0; i<periodsPerStage;i+=1) yield stage
+    const stage = atStage(2, `Phone screen`)
+    for (let i = 0; i < periodsPerStage; i += 1) yield stage
     if (general_positionDisappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `2: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!screening_phoneScreenPassed()) return singleJobApplicationResult(unsuccessfulOutcome, `2: Failed the job screen`)
   }
   {
     const stage = atStage(3, `Iterview 1`)
-    for(let i=0; i<periodsPerStage;i+=1) yield stage
+    for (let i = 0; i < periodsPerStage; i += 1) yield stage
     if (general_positionDisappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `3: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!interview1_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `3: Eliminated in first interview round`)
   }
   {
-    const stage= atStage(4, `Iterview 2`)
-    for(let i=0; i<periodsPerStage;i+=1) yield stage
+    const stage = atStage(4, `Iterview 2`)
+    for (let i = 0; i < periodsPerStage; i += 1) yield stage
     if (general_positionDisappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `4: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!interview2_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `4: Eliminated in second interview round`)
   }
   {
-    const stage= atStage(5, `Iterview 3`)
-    for(let i=0; i<periodsPerStage;i+=1) yield stage
+    const stage = atStage(5, `Iterview 3`)
+    for (let i = 0; i < periodsPerStage; i += 1) yield stage
     if (general_positionDisappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `5: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!interview3_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `5: Eliminated in third interview round`)
   }
   {
-    const stage= atStage(6, `Offer`)
-    for(let i=0; i<periodsPerStage;i+=1) yield stage
+    const stage = atStage(6, `Offer`)
+    for (let i = 0; i < periodsPerStage; i += 1) yield stage
     if (general_positionDisappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `6: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!offer_offerReceivedVersusOthers()) return singleJobApplicationResult(unsuccessfulOutcome, `6: The offer went to a better fitting candidate`)
@@ -96,11 +96,9 @@ export const singleJobApplication = function* ({
   return singleJobApplicationResult(successfulOutcome, `Its a good offer. Congratulations.`)
 }
 
-// Simulate an entire job hunt
-export const jobHuntSimulation = function* (
-  { numberOfApplicationsPerPeriod, takingAPeriodBreak, periodsForCompanyToMoveIntoNextStage },
-  startJobApplication
-) {
+// Simulate an entire job hunt. Yield back each period. This generator will run forever. It is up to invokers to stop it.
+// See also runSingleJobHuntSimulation
+export const jobHuntSimulation = function* ({ numberOfApplicationsPerPeriod, takingAPeriodBreak }, startJobApplication) {
   const currentApplicationStages = new Set()
   while (true) {
     const unsuccessful = new Set()
@@ -114,25 +112,38 @@ export const jobHuntSimulation = function* (
         else unsuccessful.add(value)
       } else stageCounts.set(value.stage, (stageCounts.get(value.stage) || 0) + 1)
     }
+    let newApplicationCount = 0
     if (!takingAPeriodBreak()) {
-      const newApplicationCount = numberOfApplicationsPerPeriod()
+      newApplicationCount = numberOfApplicationsPerPeriod()
       stageCounts.set(0, newApplicationCount)
       for (let i = 0; i < newApplicationCount; i += 1) currentApplicationStages.add(startJobApplication())
     }
 
-    yield { unsuccessful, offers, stageCounts }
+    yield { unsuccessful, offers, stageCounts, newApplicationCount }
   }
 }
 
-// Simulate a set of simulation chains and report an all their results
+// Similar to jobHuntSimulation but stop the generator once the requisite number of offers is reached
+export const runSingleJobHuntSimulation = function* (jobHuntParameters, startJobApplication) {
+  let offerCount = 0
+  const desiredOfferCount = jobHuntParameters.desiredOfferCount || 1
+
+  for (const period of jobHuntSimulation(jobHuntParameters, startJobApplication)) {
+    yield period
+    offerCount += period.offers.size
+    if (desiredOfferCount <= offerCount) return { offerCount }
+  }
+}
+// Simulate a set of simulation chains and report an all their results. Yields on the result of each chain.
 export const runSimulationChains = function* (simulationCount, runSimulation) {
   for (let i = 0; i < simulationCount; i += 1) {
     const unsuccesfulCountsByReason = new Map()
     let periodsToOffer = 0
-    for (const { stageCounts, offers, unsuccessful } of runSimulation()) {
+    let totalApplications = 0
+    for (const { stageCounts, offers, unsuccessful, newApplicationCount } of runSimulation()) {
       for (const { reason } of unsuccessful) unsuccesfulCountsByReason.set(reason, (unsuccesfulCountsByReason.get(reason) || 0) + 1)
+      totalApplications += newApplicationCount
       if (offers.size) {
-        const totalApplications = offers.size + sum(unsuccesfulCountsByReason.values()) + sum(stageCounts.values())
         yield { periodsToOffer, unsuccesfulCountsByReason, stageCounts, totalApplications }
         break
       }

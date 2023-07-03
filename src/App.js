@@ -1,6 +1,6 @@
 import { useState, createElement } from "react"
 import random from "random"
-import { compose, mean, jobHuntSimulation, singleJobApplication, runSimulationChains } from "./analysis.js"
+import { compose, sum, mean, runSingleJobHuntSimulation, singleJobApplication, runSimulationChains } from "./analysis.js"
 import "./App.css"
 
 const BinomialParameter = ({ name, value, onChange, description }) => (
@@ -66,7 +66,8 @@ const simulationParametersConfig = {
     componentArgs: { min: 1, max: 100 },
     description: `How many applicants per ${period} are you comitting to make?`,
   },
-  apply_jobIsReal: {
+
+  takingAPeriodBreak: {
     ...binomialParameter,
     defaultArgs: { value: 0.125 },
     description: `Sometimes you just need to take a break. How likely in a given ${period} are you to take a break and skip applying?`,
@@ -139,14 +140,43 @@ const simulationParametersConfig = {
   },
 }
 
+const SingleRunSimulation = ({ parameters }) => {
+  const periods = Array.from(runSingleJobHuntSimulation(parameters, () => singleJobApplication(parameters)))
+  const offerCount = sum(periods.map((p) => p.offers.size))
+  return (
+    <article className="singleRunSimulation">
+      <header>Sample single job hunt simulation.</header>
+      <p>
+        The job hunt took {periods.length} {`${period}s`}. Ultimately receiving {offerCount} offers.
+      </p>
+      <ul>
+        {periods.map(({ unsuccessful, newApplicationCount, stageCounts }, period) => (
+          <li key={period}>
+            <header>Week {period}:</header>
+            <p>Applied to: {newApplicationCount}</p>
+            <p>Rejected from: {unsuccessful.size}</p>
+            <p>
+              In flight status:
+              <pre>{JSON.stringify(Object.fromEntries(stageCounts.entries()))}</pre>
+            </p>
+          </li>
+        ))}
+      </ul>
+    </article>
+  )
+}
+
 export const App = () => {
   const [simulationParameters, _setSimulationParmeters] = useState(
     Object.fromEntries(Object.entries(simulationParametersConfig).map(([name, { defaultArgs }]) => [name, defaultArgs]))
   )
   // TODO - check if this can be done with useReducer or something similar
   const setSimulationParmeters = (fragment) => _setSimulationParmeters({ ...simulationParameters, ...fragment })
+  const simulationRunParameters = Object.fromEntries(
+    Object.entries(simulationParameters).map(([name, value]) => [name, simulationParametersConfig[name].fn(value)])
+  )
   return (
-    <div className="App">
+    <article className="App">
       <ul>
         {Object.entries(simulationParameters).map(([name, args]) => {
           const { component, description, componentArgs } = simulationParametersConfig[name]
@@ -163,6 +193,9 @@ export const App = () => {
           )
         })}
       </ul>
-    </div>
+      <section className="results">
+        <SingleRunSimulation parameters={simulationRunParameters} />
+      </section>
+    </article>
   )
 }

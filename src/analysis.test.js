@@ -36,7 +36,7 @@ describe(`run simulation`, () => {
     console.log(`RESULT`, val.value)
   })
 
-  it(`running through a set of simulations`, () => {
+  it(`running through a full simulation until you get a job`, () => {
     let i = 0
     for (const { stageCounts, offers, unsuccessful } of runSimulation()) {
       console.log(`WEEK`, i, `REJECTED`, unsuccessful.size, `STAGES`, stageCounts, `OFFERS`, offers.size)
