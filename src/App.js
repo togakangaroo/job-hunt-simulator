@@ -20,6 +20,8 @@ export const App = () => {
         Here is a basic simulation of a job hunt. Given the parameters you set on the left, it is run {simulationCount} times. On the right you see
         the results of running simulations and a {period}ly log of a sample simulation. Note that the purpose is not so much for accurate estimates,
         so much as to give you a feel for how best to invest your time.
+        <a href="https://github.com/togakangaroo/job-hunt-simulator">Repository here.</a> Pull requests to redo my likely-bad data science are very
+        welcome.
       </p>
       <section className="parameter-configuration">
         <ul>
