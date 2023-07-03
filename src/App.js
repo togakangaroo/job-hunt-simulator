@@ -163,7 +163,7 @@ const SingleRunSimulation = ({ parameters }) => {
   const periods = Array.from(runSingleJobHuntSimulation(parameters, () => singleJobApplication(parameters)))
   const offerCount = sum(periods.map((p) => p.offers.size))
   return (
-    <article className="singleRunSimulation">
+    <article className="single-run-simulation">
       <header>Sample single job hunt simulation.</header>
       <p>
         The job hunt took {periods.length} {`${period}s`}. Ultimately receiving {offerCount} offers.
@@ -181,6 +181,36 @@ const SingleRunSimulation = ({ parameters }) => {
           </li>
         ))}
       </ul>
+    </article>
+  )
+}
+
+const SimulationRun = ({ parameters }) => {
+  const simulationCount = 1000
+  const simulationResults = Array.from(
+    runSimulationChains(simulationCount, () => runSingleJobHuntSimulation(parameters, () => singleJobApplication(parameters)))
+  )
+  const meanPeriodsToEnd = mean(simulationResults.map((x) => x.periods))
+  const meanTotalApplications = mean(simulationResults.map((x) => x.totalApplications))
+  const allRejectionReasons = new Set(simulationResults.map((x) => x.unsuccesfulCountsByReason.keys()).flatMap((x) => Array.from(x)))
+  const meanTotalOffers = mean(simulationResults.map((x) => x.allOffers.size))
+  const meanRejectionsByReason = new Map(
+    Array.from(allRejectionReasons.values()).map((reason) => [
+      reason,
+      mean(simulationResults.map((x) => x.unsuccesfulCountsByReason.get(reason) || 0)),
+    ])
+  )
+  return (
+    <article className="simulation-run">
+      <header>Simulation Results</header>
+      <dl>
+        <dd>Mean {period}s in job hunt</dd>
+        <dt>{meanPeriodsToEnd}</dt>
+        <dd>Mean total applications</dd>
+        <dt>{meanTotalApplications}</dt>
+        <dd>Mean total offers</dd>
+        <dt>{meanTotalOffers}</dt>
+      </dl>
     </article>
   )
 }
@@ -213,6 +243,7 @@ export const App = () => {
         })}
       </ul>
       <section className="results">
+        <SimulationRun parameters={simulationRunParameters} />
         <SingleRunSimulation parameters={simulationRunParameters} />
       </section>
     </article>
