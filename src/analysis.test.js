@@ -19,7 +19,7 @@ describe(`run simulation`, () => {
     interview3_passed: random.binomial(1, 0.7),
     offer_offerReceivedVersusOthers: random.binomial(1, 0.5),
     offer_isGood: random.binomial(1, 0.8),
-    general_position_disappears: random.binomial(1, 0.05), // will be tested multiple times
+    general_positionDisappears: random.binomial(1, 0.05), // will be tested multiple times
     general_periodsForCompanyToMoveIntoNextStage: compose(random.poisson(1), (x) => x + 1),
   }
   const jobHuntStrategyParameters = {

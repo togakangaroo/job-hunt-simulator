@@ -38,7 +38,7 @@ export const singleJobApplication = function* ({
   interview3_passed,
   offer_offerReceivedVersusOthers,
   offer_isGood,
-  general_position_disappears,
+  general_positionDisappears,
   general_periodsForCompanyToMoveIntoNextStage,
 }) {
   const periodsPerStage = general_periodsForCompanyToMoveIntoNextStage()
@@ -59,35 +59,35 @@ export const singleJobApplication = function* ({
   {
     const stage= atStage(2, `Phone screen`)
     for(let i=0; i<periodsPerStage;i+=1) yield stage
-    if (general_position_disappears())
+    if (general_positionDisappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `2: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!screening_phoneScreenPassed()) return singleJobApplicationResult(unsuccessfulOutcome, `2: Failed the job screen`)
   }
   {
     const stage = atStage(3, `Iterview 1`)
     for(let i=0; i<periodsPerStage;i+=1) yield stage
-    if (general_position_disappears())
+    if (general_positionDisappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `3: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!interview1_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `3: Eliminated in first interview round`)
   }
   {
     const stage= atStage(4, `Iterview 2`)
     for(let i=0; i<periodsPerStage;i+=1) yield stage
-    if (general_position_disappears())
+    if (general_positionDisappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `4: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!interview2_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `4: Eliminated in second interview round`)
   }
   {
     const stage= atStage(5, `Iterview 3`)
     for(let i=0; i<periodsPerStage;i+=1) yield stage
-    if (general_position_disappears())
+    if (general_positionDisappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `5: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!interview3_passed()) return singleJobApplicationResult(unsuccessfulOutcome, `5: Eliminated in third interview round`)
   }
   {
     const stage= atStage(6, `Offer`)
     for(let i=0; i<periodsPerStage;i+=1) yield stage
-    if (general_position_disappears())
+    if (general_positionDisappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `6: The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!offer_offerReceivedVersusOthers()) return singleJobApplicationResult(unsuccessfulOutcome, `6: The offer went to a better fitting candidate`)
     if (!offer_isGood()) return singleJobApplicationResult(unsuccessfulOutcome, `6: Received an offer, but a bad one`)

@@ -1,70 +1,168 @@
+import { useState, createElement } from "react"
 import random from "random"
 import { compose, mean, jobHuntSimulation, singleJobApplication, runSimulationChains } from "./analysis.js"
-import logo from "./logo.svg"
 import "./App.css"
 
-const jobApplicationParameters = {
-  apply_jobIsReal: random.binomial(1, 0.7),
-  apply_numberOfApplicants: random.poisson(20),
-  apply_numberOfApplicantsToMoveOn: random.poisson(5),
-  apply_resumeQuality: random.normal(0.7, 0.15),
-  screening_phoneScreenPassed: random.binomial(1, 0.5),
-  interview1_passed: random.binomial(1, 0.5),
-  interview2_passed: random.binomial(1, 0.3),
-  interview3_passed: random.binomial(1, 0.7),
-  offer_offerReceivedVersusOthers: random.binomial(1, 0.5),
-  offer_isGood: random.binomial(1, 0.8),
-  general_position_disappears: random.binomial(1, 0.05), // will be tested multiple times
-  general_periodsForCompanyToMoveIntoNextStage: compose(random.poisson(1), (x) => x + 1),
-}
-const jobHuntStrategyParameters = {
-  numberOfApplicationsPerPeriod: random.poisson(25),
-  takingAPeriodBreak: random.binomial(1, 0.125),
-}
-
-const BinomialParameter = ({ name, value, onChange }) => (
-  <label>
-    <div classname="label">{name}</div>
-    <input type="range" value={value} onChange={(e) => onChange(e.target.value)} min={0.05} max={0.95} step={0.05} />
-    <input readOnly value={value} />
-  </label>
-)
-
-const PoissonParameter = ({ name, value, onChange, max, min = 1 }) => (
-  <label>
-    <div classname="label">{name}</div>
-    <input type="range" value={value} onChange={(e) => onChange(e.target.value)} min={min} max={max} step={1} />
-    <input readOnly value={value} />
-  </label>
-)
-
-const NormalParameter = ({ name, onChangeMean, onChangeStdDev, mean, stddev }) => (
+const BinomialParameter = ({ name, value, onChange, description }) => (
   <section>
+    <header>
+      <p>{description}</p>
+    </header>
     <label>
-      <div classname="label">{name} - Mean</div>
-      <input type="range" value={mean} onChange={(e) => onChangeMean(e.target.value)} min={0.05} max={0.95} step={0.05} />
+      <div className="label">{name}</div>
+      <input type="range" value={value} onChange={(e) => onChange({ value: parseFloat(e.target.value) })} min={0.05} max={0.95} step={0.05} />
+      <input readOnly value={value} /> (Likelihood of success)
+    </label>
+  </section>
+)
+
+const PoissonParameter = ({ name, value, onChange, description, max, min = 1, step = 1 }) => (
+  <section>
+    <header>
+      <p>{description}</p>
+    </header>
+    <label>
+      <div className="label">{name}</div>
+      <input type="range" value={value} onChange={(e) => onChange({ value: parseFloat(e.target.value) })} min={min} max={max} step={step} />
+      <input readOnly value={value} /> (λ parameter in a Poisson distribution)
+    </label>
+  </section>
+)
+
+const NormalParameter = ({ name, onChange, mean, stddev, description }) => (
+  <section>
+    <header>
+      {name}
+      <p>{description}</p>
+    </header>
+    <label>
+      <div className="label">{name} - Mean</div>
+      <input type="range" value={mean} onChange={(e) => onChange({ mean: parseFloat(e.target.value), stddev })} min={0.05} max={0.95} step={0.05} />
       <input readOnly value={mean} />
     </label>
     <label>
-      <div classname="label">{name} - Standard Deviation</div>
-      <input type="range" value={stddev} onChange={(e) => onChangeMean(e.target.value)} min={0} max={1} step={0.05} />
+      <div className="label">{name} - Standard Deviation</div>
+      <input type="range" value={stddev} onChange={(e) => onChange({ mean, stddev: parseFloat(e.target.value) })} min={0} max={1} step={0.05} />
       <input readOnly value={stddev} />
     </label>
   </section>
 )
 
+const poissonParameter = {
+  fn: (x) => random.poisson(x.value),
+  component: PoissonParameter,
+}
+const binomialParameter = {
+  fn: (x) => random.binomial(1, x.value),
+  component: BinomialParameter,
+}
+
+const period = `week`
+
+const simulationParametersConfig = {
+  numberOfApplicationsPerPeriod: {
+    ...poissonParameter,
+    defaultArgs: { value: 25 },
+    componentArgs: { min: 1, max: 100 },
+    description: `How many applicants per ${period} are you comitting to make?`,
+  },
+  apply_jobIsReal: {
+    ...binomialParameter,
+    defaultArgs: { value: 0.125 },
+    description: `Sometimes you just need to take a break. How likely in a given ${period} are you to take a break and skip applying?`,
+  },
+  apply_jobIsReal: {
+    ...binomialParameter,
+    defaultArgs: { value: 0.7 },
+    description: `Sometimes the job posting is not real. Maybe they're gathering resumes rather than actively hiring, or it's an old posting, or its slated for a specific internal person and had to be posted publicly, or often there just isn't anyone manning the hiring apparatus on the company side. This is the probability the job posting is real and active.`,
+  },
+  apply_numberOfApplicants: {
+    ...poissonParameter,
+    defaultArgs: { value: 20 },
+    componentArgs: { min: 1, max: 200 },
+    description: `How many applicants per ${period} are applying to this position on the average?`,
+  },
+  apply_numberOfApplicantsToMoveOn: {
+    ...poissonParameter,
+    defaultArgs: { value: 5 },
+    componentArgs: { min: 1, max: 25 },
+    description: `How many applicants per ${period} from the total amount of applicants will be passed onto the next phase on average?`,
+  },
+  apply_resumeQuality: {
+    defaultArgs: { mean: 0.7, stddev: 0.15 },
+    fn: (x) => random.normal(x.mean, x.stddev),
+    component: NormalParameter,
+    description: `How good is your resume compared to others as far as a fit for this role is concerned? Imagine the fit of all resumes on a bell curve 0-1 with peak at .5. The mean represents where your resume falls, the standard deviation is how sure you are of this.`,
+  },
+  screening_phoneScreenPassed: {
+    ...binomialParameter,
+    defaultArgs: { value: 0.5 },
+    description: `Likelihood that you pass the phone screen.`,
+  },
+  interview1_passed: {
+    ...binomialParameter,
+    defaultArgs: { value: 0.5 },
+    description: `Likelihood that you pass the first interview.`,
+  },
+  interview2_passed: {
+    ...binomialParameter,
+    defaultArgs: { value: 0.3 },
+    description: `Likelihood that you pass the second interview.`,
+  },
+  interview3_passed: {
+    ...binomialParameter,
+    defaultArgs: { value: 0.7 },
+    description: `Likelihood that you pass the third interview.`,
+  },
+  offer_offerReceivedVersusOthers: {
+    ...binomialParameter,
+    defaultArgs: { value: 0.5 },
+    description: `Likelihood that of all the people who passed the interviews you receive an offer. Given that you passed all the interviews, how likely are you to get an offer versus hearing they went with a more suitable candidate?`,
+  },
+  offer_isGood: {
+    ...binomialParameter,
+    defaultArgs: { value: 0.8 },
+    description: `Given that you receive an offer, how likeley is it that it will be good enough to accept (or that you can negotiate it to that).`,
+  },
+  general_periodsForCompanyToMoveIntoNextStage: {
+    fn: (x) => compose(random.poisson(x.value), (n) => n + 1),
+    component: PoissonParameter,
+    defaultArgs: { value: 1 },
+    componentArgs: { min: 0.5, max: 2, step: 0.1 },
+    description: `Companies handle resumes at different paces. This is an estimate of how many ${period}s a company will take to move you to the next stage.`,
+  },
+  general_positionDisappears: {
+    ...binomialParameter,
+    defaultArgs: { value: 0.05 },
+    componentArgs: { min: 0.01, max: 0.3, step: 0.01 },
+    description: `Sometimes positions get frozen, re-orged, or the ball gets dropped. What are the chances at each stage that this will happen with each position? Note that this will be applied at each stage after the first.`,
+  },
+}
+
 export const App = () => {
+  const [simulationParameters, _setSimulationParmeters] = useState(
+    Object.fromEntries(Object.entries(simulationParametersConfig).map(([name, { defaultArgs }]) => [name, defaultArgs]))
+  )
+  // TODO - check if this can be done with useReducer or something similar
+  const setSimulationParmeters = (fragment) => _setSimulationParmeters({ ...simulationParameters, ...fragment })
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          Learn React
-        </a>
-      </header>
+      <ul>
+        {Object.entries(simulationParameters).map(([name, args]) => {
+          const { component, description, componentArgs } = simulationParametersConfig[name]
+          return (
+            <li key={name}>
+              {createElement(component, {
+                name,
+                description,
+                onChange: (x) => setSimulationParmeters({ [name]: x }),
+                ...(componentArgs || {}),
+                ...args,
+              })}
+            </li>
+          )
+        })}
+      </ul>
     </div>
   )
 }
