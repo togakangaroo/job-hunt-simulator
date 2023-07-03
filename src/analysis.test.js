@@ -123,6 +123,22 @@ const jobHuntSimulation = function* (
   }
 }
 
+const runSimulationChains = function* (simulationCount, runSimulation) {
+  for (let i = 0; i < simulationCount; i += 1) {
+    const unsuccesfulCountsByReason = new Map()
+    let periodsToOffer = 0
+    for (const { stageCounts, offers, unsuccessful } of runSimulation()) {
+      for (const { reason } of unsuccessful) unsuccesfulCountsByReason.set(reason, (unsuccesfulCountsByReason.get(reason) || 0) + 1)
+      if (offers.size) {
+        const totalApplications = offers.size + sum(unsuccesfulCountsByReason.values()) + sum(stageCounts.values())
+        yield { periodsToOffer, unsuccesfulCountsByReason, stageCounts, totalApplications }
+        break
+      }
+      periodsToOffer += 1
+    }
+  }
+}
+
 describe(`run simulation`, () => {
   const jobApplicationParameters = {
     apply_jobIsReal: random.binomial(1, 0.7),
@@ -161,25 +177,9 @@ describe(`run simulation`, () => {
     }
   })
 
-  const runSimulationChains = function* (simulationCount) {
-    for (let i = 0; i < simulationCount; i += 1) {
-      const unsuccesfulCountsByReason = new Map()
-      let periodsToOffer = 0
-      for (const { stageCounts, offers, unsuccessful } of runSimulation()) {
-        for (const { reason } of unsuccessful) unsuccesfulCountsByReason.set(reason, (unsuccesfulCountsByReason.get(reason) || 0) + 1)
-        if (offers.size) {
-          const totalApplications = offers.size + sum(unsuccesfulCountsByReason.values()) + sum(stageCounts.values())
-          yield { periodsToOffer, unsuccesfulCountsByReason, stageCounts, totalApplications }
-          break
-        }
-        periodsToOffer += 1
-      }
-    }
-  }
-
   it(`running through several simulation chains and averaging`, () => {
     const simulationCount = 100
-    const simulationResults = Array.from(runSimulationChains(simulationCount))
+    const simulationResults = Array.from(runSimulationChains(simulationCount, runSimulation))
     const meanPeriodsToOffer = mean(simulationResults.map((x) => x.periodsToOffer))
     const meanTotalApplications = mean(simulationResults.map((x) => x.totalApplications))
     const allRejectionReasons = new Set(simulationResults.map((x) => x.unsuccesfulCountsByReason.keys()).flatMap((x) => Array.from(x)))
