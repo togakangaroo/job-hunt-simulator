@@ -17,6 +17,10 @@
     grid-area: simulation;
     overflow-y: auto;
 }
+.simulation-run {
+    border-bottom: 1px dashed grey;
+    padding-bottom: 10px;
+}
 
 ul {
     margin: 0;
