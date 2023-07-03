@@ -27,18 +27,18 @@ export const SimulationRun = ({ parameters }) => {
       {!simulationResults ? null : (
         <dl className="simulation-results">
           <dd>Mean {period}s in job hunt</dd>
-          <dt>{simulationResults.meanPeriodsToEnd}</dt>
+          <dt>{simulationResults.meanPeriodsToEnd.toFixed(2)}</dt>
           <dd>Mean total applications</dd>
-          <dt>{simulationResults.meanTotalApplications}</dt>
+          <dt>{simulationResults.meanTotalApplications.toFixed(2)}</dt>
           <dd>Mean total offers</dd>
-          <dt>{simulationResults.meanTotalOffers}</dt>
+          <dt>{simulationResults.meanTotalOffers.toFixed(2)}</dt>
           <dd>Mean Rejections by Reason</dd>
           <dt>
             <dl className="simulation-rejections-by-reason">
               {simulationResults.meanRejectionsByReason.map(([reason, count]) => (
                 <React.Fragment key={reason}>
                   <dd>{reason}</dd>
-                  <dt>{count}</dt>
+                  <dt>{count.toFixed(2)}</dt>
                 </React.Fragment>
               ))}
             </dl>

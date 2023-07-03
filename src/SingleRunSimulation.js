@@ -1,4 +1,4 @@
-import { sum, runSingleJobHuntSimulation, singleJobApplication, runSimulationChains } from "./analysis.js"
+import { sum, runSingleJobHuntSimulation, singleJobApplication } from "./analysis.js"
 import { period } from "./constants.js"
 
 export const SingleRunSimulation = ({ parameters }) => {
