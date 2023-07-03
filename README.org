@@ -23,8 +23,8 @@ I'm going to start by breaking things down into phases and thinking of the proba
 - Amount per period that will be passed through to next stage
 
 *** Screening
-- Likelihood to pass the screening step? Normal
-- Likelihood the position disappears (position filled, frozen, re-org, ball dropped, etc)
+- Likelihood to pass the screening step? binomial
+- Likelihood the position disappears (position filled, frozen, re-org, ball dropped, etc), binomial
 
 *** Interview 1
 - Likelihood to pass the interviewing step? Normal

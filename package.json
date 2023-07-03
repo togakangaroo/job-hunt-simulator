@@ -28,12 +28,13 @@
       "semi": [
         "error",
         "never"
-      ]
+      ], 
+      "no-lone-blocks": ["off"]
     }
   },
   "prettier": {
     "semi": false,
-    "printWidth": 200
+    "printWidth": 150
   },
   "browserslist": {
     "production": [
