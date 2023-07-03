@@ -1,4 +1,4 @@
-import { useState, createElement } from "react"
+import React, { useState, createElement } from "react"
 import random from "random"
 import { compose, sum, mean, runSingleJobHuntSimulation, singleJobApplication, runSimulationChains } from "./analysis.js"
 import "./App.css"
@@ -194,12 +194,10 @@ const SimulationRun = ({ parameters }) => {
   const meanTotalApplications = mean(simulationResults.map((x) => x.totalApplications))
   const allRejectionReasons = new Set(simulationResults.map((x) => x.unsuccesfulCountsByReason.keys()).flatMap((x) => Array.from(x)))
   const meanTotalOffers = mean(simulationResults.map((x) => x.allOffers.size))
-  const meanRejectionsByReason = new Map(
-    Array.from(allRejectionReasons.values()).map((reason) => [
-      reason,
-      mean(simulationResults.map((x) => x.unsuccesfulCountsByReason.get(reason) || 0)),
-    ])
-  )
+  const meanRejectionsByReason = Array.from(allRejectionReasons.values()).map((reason) => [
+    reason,
+    mean(simulationResults.map((x) => x.unsuccesfulCountsByReason.get(reason) || 0)),
+  ])
   return (
     <article className="simulation-run">
       <header>Simulation Results</header>
@@ -210,6 +208,17 @@ const SimulationRun = ({ parameters }) => {
         <dt>{meanTotalApplications}</dt>
         <dd>Mean total offers</dd>
         <dt>{meanTotalOffers}</dt>
+        <dd>Mean Rejections by Reason</dd>
+        <dt>
+          <dl>
+            {meanRejectionsByReason.map(([reason, count]) => (
+              <React.Fragment key={reason}>
+                <dd>{reason}</dd>
+                <dt>{count}</dt>
+              </React.Fragment>
+            ))}
+          </dl>
+        </dt>
       </dl>
     </article>
   )
