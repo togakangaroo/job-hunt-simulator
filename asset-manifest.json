@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.6f657762.css",
-    "main.js": "/static/js/main.496d58c9.js",
-    "static/js/787.7b45d567.chunk.js": "/static/js/787.7b45d567.chunk.js",
-    "index.html": "/index.html",
-    "main.6f657762.css.map": "/static/css/main.6f657762.css.map",
-    "main.496d58c9.js.map": "/static/js/main.496d58c9.js.map",
-    "787.7b45d567.chunk.js.map": "/static/js/787.7b45d567.chunk.js.map"
+    "main.css": "/job-hunt-simulator/static/css/main.6f657762.css",
+    "main.js": "/job-hunt-simulator/static/js/main.24dfa818.js",
+    "static/js/787.7b45d567.chunk.js": "/job-hunt-simulator/static/js/787.7b45d567.chunk.js",
+    "index.html": "/job-hunt-simulator/index.html",
+    "main.6f657762.css.map": "/job-hunt-simulator/static/css/main.6f657762.css.map",
+    "main.24dfa818.js.map": "/job-hunt-simulator/static/js/main.24dfa818.js.map",
+    "787.7b45d567.chunk.js.map": "/job-hunt-simulator/static/js/787.7b45d567.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.6f657762.css",
-    "static/js/main.496d58c9.js"
+    "static/js/main.24dfa818.js"
   ]
 }
