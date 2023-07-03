@@ -1,6 +1,8 @@
 {
   "name": "job-hunting-simulator",
   "version": "0.1.0",
+  "homepage": "https://togakangaroo.github.io/job-hunt-simulator",
+  "license": "MIT",
   "dependencies": {
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
