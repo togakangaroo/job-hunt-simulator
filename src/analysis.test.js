@@ -18,6 +18,7 @@ const singleJobApplication = function* ({
   interview2_passed,
   interview3_passed,
   offer_offerReceivedVersusOthers,
+  offer_isGood,
 }) {
   {
     yield atStage(1, `Resume filtering`)
@@ -61,6 +62,7 @@ const singleJobApplication = function* ({
     if (general_position_disappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `The job has disappeared, been frozen, or the hiring pipeline broke.`)
     if (!offer_offerReceivedVersusOthers()) return singleJobApplicationResult(unsuccessfulOutcome, `The offer went to a better fitting candidate`)
+    if (!offer_isGood()) return singleJobApplicationResult(unsuccessfulOutcome, `Received an offer, but a bad one`)
   }
 
   return singleJobApplicationResult(successfulOutcome, `Its a good offer. Congratulations.`)
@@ -95,16 +97,17 @@ const jobHuntSimulation = function* ({ numberOfApplicationsPerPeriod, takingAPer
 
 describe(`run simulation`, () => {
   const jobApplicationParameters = {
-    apply_jobIsReal: random.binomial(1, 0.8),
+    apply_jobIsReal: random.binomial(1, 0.7),
     apply_numberOfApplicants: random.poisson(20),
     apply_numberOfApplicantsToMoveOn: random.poisson(5),
     apply_resumeQuality: random.normal(0.7, 0.1),
-    general_position_disappears: random.binomial(1, 0.05), // will be tested multiple times
     screening_failPhoneScreen: random.binomial(1, 0.5),
     interview1_passed: random.binomial(1, 0.6),
     interview2_passed: random.binomial(1, 0.3),
     interview3_passed: random.binomial(1, 0.7),
     offer_offerReceivedVersusOthers: random.binomial(1, 0.5),
+    offer_isGood: random.binomial(1, 0.8),
+    general_position_disappears: random.binomial(1, 0.05), // will be tested multiple times
   }
 
   it(`running single job application simulation yields next steps until done`, () => {
