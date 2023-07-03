@@ -28,8 +28,10 @@
       "semi": [
         "error",
         "never"
-      ], 
-      "no-lone-blocks": ["off"]
+      ],
+      "no-lone-blocks": [
+        "off"
+      ]
     }
   },
   "prettier": {
