@@ -2,7 +2,9 @@ const changeNumber =
   (onChange, propertyName = `value`, additionalProps = {}) =>
   (e) => {
     const val = parseFloat(e.target.value)
-    if (!isNaN(val)) onChange({ [propertyName]: val, ...additionalProps })
+    const min = parseFloat(e.target.min)
+    const max = parseFloat(e.target.max)
+    if (!isNaN(val) && val >= min && val <= max) onChange({ [propertyName]: val, ...additionalProps })
   }
 
 export const BinomialParameter = ({ name, value, onChange, description, min = 0.05, max = 0.95, step = 0.05 }) => {
