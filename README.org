@@ -1,4 +1,4 @@
-#+TITLE: Job Hunt Simpulator
+#+TITLE: Job Hunt Simulator
 
 A very simple job hunt simulator to pair with a talk I'm giving on the same subject.
 
@@ -46,35 +46,66 @@ I'm going to start by breaking things down into phases and thinking of the proba
 - Likelihood of taking an offer? binomial
 
 *** AI
-#+begin_ai
-[SYS]: You are an expert in statistics, data science, and programming. Give answers in code when appropriate. Prefer functional programming techniques ang generator functions. Assume we are going to be running all code in a web browser with javascript. Feel free to use libraries off of npm.
-[ME]: Someone is telling me that they will apply to X jobs a week on average. I assume X is the lambda parameter in a poisson distribution. How can I create a sampling or 10 weeks and how many jobs they applied to in each week?
-
-To create a sampling of the number of jobs someone applies to in 10 weeks, you can use the Poisson distribution. Here's a possible approach using JavaScript and the `random` library from npm:
-
-```javascript
-const random = require('random');
-
-function* generateJobApplications(lambda, numWeeks) {
-  for (let i = 0; i < numWeeks; i++) {
-    yield random.poisson(lambda);
-  }
+#+begin_ai :model gpt-4
+[SYS]: You are an expert in statistics, data science, reactjs and programming. Give answers in code when appropriate. Prefer functional programming techniques and generator functions. Assume we are going to be running all code in a web browser with javascript. Feel free to use libraries off of npm.
+[ME]: Create a reactjs function component that will allow a user to download a value to a file as json and to load it. The interface should look like this:
+```
+const SaveParameters = ({parameters, setParameters}) => {
 }
+```
+It should have a button. When it is pressed, `JSON.stringify(parameters)` will be downloaded to the user as a json file. It will also have a file upload. When a json file is selected for it it will do `JSON.parse` of its contents and call `setParametsrs` with the result
+[AI]:
+Firstly, you need to install `file-saver` in your project for saving files on the client-side.
 
-const lambda = 5; // Average number of job applications per week
-const numWeeks = 10; // Number of weeks to sample
+You can install the package by running:
 
-const jobApplications = [...generateJobApplications(lambda, numWeeks)];
-
-console.log(jobApplications);
+```bash
+npm install file-saver --save 
 ```
 
-In the code above, the `generateJobApplications` generator function generates a random number of job applications using the Poisson distribution for each week. The lambda parameter represents the average number of job applications per week. The generator produces one value for each week specified by `numWeeks`. 
+Then, here is the ReactJS component that matches your specifications:
 
-The `[...generator]` syntax is used to convert the generator output into an array, which can be stored in the `jobApplications` variable. Finally, the `console.log(jobApplications)` line prints the sampled number of job applications for each week.
+```jsx
+import React from 'react';
+import { saveAs } from 'file-saver';
 
-[ME]: 
-#+end_ai
+const SaveParameters = ({parameters, setParameters}) => {
+  // download parameters as a json file
+  const handleDownload = () => {
+    const blob = new Blob([JSON.stringify(parameters)], {type: "application/json;charset=utf-8"});
+    saveAs(blob, 'parameters.json');
+  }
 
-#+begin_ai
+  // parse the uploaded json file and update parameters
+  const handleUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const jsonObj = JSON.parse(event.target.result);
+        setParameters(jsonObj);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={handleDownload}>Download Parameters</button>
+      <input type='file' accept='.json' onChange={handleUpload} />
+    </div>
+  );
+}
+
+export default SaveParameters;
+```
+
+In this code:
+
+- `handleDownload` creates a Blob from parameters, then triggers a download prompt to save it as a JSON file.
+- `handleUpload` reads an uploaded JSON file, then parse it into a JavaScript object and updates parameters by calling `setParameters`.
+
+Make sure your `parameters` prop is a serializable object, and you have the appropriate permissions to read and write files.
+
+[ME]:  pf
 #+end_ai
