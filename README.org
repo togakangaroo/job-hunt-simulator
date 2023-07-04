@@ -1,4 +1,4 @@
-#+TITLE: Job Hunt Simpulator
+#+TITLE: Job Hunt Simulator
 
 A very simple job hunt simulator to pair with a talk I'm giving on the same subject.
 
@@ -6,7 +6,7 @@ A very simple job hunt simulator to pair with a talk I'm giving on the same subj
 We're going to break down the job hunt into multiple steps and preform a very basic monte carlo simulation to demonstrate the relative value of where to invest your time at improving.
 
 I'm going to start by breaking things down into phases and thinking of the probabilities as independent of each other. This begs the question of why do a simulation at all versus just multiplying through the probabilities? I am thinking of the following
-- I want to give people an instinct for how the various values affect thigns. I want it to be interactive and it should feel "real". Reporting the exact same value each time wouldn't do this.
+- I want to give people an instinct for how the various values affect things. I want it to be interactive and it should feel "real". Reporting the exact same value each time wouldn't do this.
 - I want to be able to think about variances and potentially even non-normal distribution types as well
 - I'm only starting with independent distributions. I could imagine introducing dependent variables, I just am not yet.
 
@@ -47,7 +47,7 @@ I'm going to start by breaking things down into phases and thinking of the proba
 
 *** AI
 #+begin_ai
-[SYS]: You are an expert in statistics, data science, and programming. Give answers in code when appropriate. Prefer functional programming techniques ang generator functions. Assume we are going to be running all code in a web browser with javascript. Feel free to use libraries off of npm.
+[SYS]: You are an expert in statistics, data science, and programming. Give answers in code when appropriate. Prefer functional programming techniques and generator functions. Assume we are going to be running all code in a web browser with javascript. Feel free to use libraries off of npm.
 [ME]: Someone is telling me that they will apply to X jobs a week on average. I assume X is the lambda parameter in a poisson distribution. How can I create a sampling or 10 weeks and how many jobs they applied to in each week?
 
 To create a sampling of the number of jobs someone applies to in 10 weeks, you can use the Poisson distribution. Here's a possible approach using JavaScript and the `random` library from npm:
