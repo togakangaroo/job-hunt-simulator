@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react"
 import { mean, runSingleJobHuntSimulation, singleJobApplication, runSimulationChains } from "./analysis.js"
-import { period, simulationCount } from "./constants.js"
+import { period } from "./constants.js"
 
 const HorizontalBar = ({width}) => (
   <div className="graph-horizontal-bar" style={{width: `${width}%`}} />
 )
 
-export const SimulationRun = ({ parameters }) => {
+export const SimulationRun = ({ parameters: originalParameters }) => {
+  const {general_numberOfSimulationsToRun, ...parameters} = originalParameters
   const [simulationResults, setSimulationResults] = useState(null)
 
   useEffect(() => {
     const handle = setTimeout(() => {
       const results = Array.from(
-        runSimulationChains(simulationCount, () => runSingleJobHuntSimulation(parameters, () => singleJobApplication(parameters)))
+        runSimulationChains(general_numberOfSimulationsToRun(), () => runSingleJobHuntSimulation(parameters, () => singleJobApplication(parameters)))
       )
       const meanPeriodsToEnd = mean(results.map((x) => x.periods))
       const meanTotalApplications = mean(results.map((x) => x.totalApplications))
@@ -25,7 +26,7 @@ export const SimulationRun = ({ parameters }) => {
       setSimulationResults({ meanPeriodsToEnd, meanTotalOffers, meanTotalApplications, meanRejectionsByReason })
     }, 500) //debounce by 500ms
     return () => clearTimeout(handle)
-  }, [parameters])
+  }, [originalParameters]) // eslint-disable-line
 
   const pcnt = val => !simulationResults || !simulationResults.meanTotalApplications ? null : (100.0 * val)/simulationResults.meanTotalApplications
 

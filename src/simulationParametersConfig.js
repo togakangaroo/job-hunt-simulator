@@ -11,7 +11,10 @@ const binomialParameter = {
   fn: (x) => random.binomial(1, x.value),
   component: BinomialParameter,
 }
-
+const constantParamter = {
+  fn: (x) => () => x.value,
+  component: ConstantParameter,
+}
 export const simulationParametersConfig = {
   numberOfApplicationsPerPeriod: {
     ...poissonParameter,
@@ -20,8 +23,7 @@ export const simulationParametersConfig = {
     description: `How many applicants per ${period} are you comitting to make?`,
   },
   desiredOfferCount: {
-    fn: (x) => () => x.value,
-    component: ConstantParameter,
+    ...constantParamter,
     defaultArgs: { value: 1 },
     componentArgs: { min: 1, max: 10, step: 1 },
     description: `How many offers are you holding out for?`,
@@ -96,5 +98,11 @@ export const simulationParametersConfig = {
     defaultArgs: { value: 0.05 },
     componentArgs: { min: 0.01, max: 0.3, step: 0.01 },
     description: `Sometimes positions get frozen, re-orged, or the ball gets dropped. What are the chances at each stage that this will happen with each position? Note that this will be applied at each stage after the first.`,
+  },
+  general_numberOfSimulationsToRun: {
+    ...constantParamter,
+    defaultArgs: { value: 1000  },
+    componentArgs: {min: 10, max: 10000, step: 10},
+    description: `Number of times we run the simulation to get the averaged out figures. High values will give more consistent results but take far longer to run.`,
   },
 }
