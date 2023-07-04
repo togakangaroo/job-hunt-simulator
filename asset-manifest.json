@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/job-hunt-simulator/static/css/main.da5247bd.css",
-    "main.js": "/job-hunt-simulator/static/js/main.99225d72.js",
+    "main.css": "/job-hunt-simulator/static/css/main.f58ff474.css",
+    "main.js": "/job-hunt-simulator/static/js/main.f9e9416e.js",
     "static/js/787.7b45d567.chunk.js": "/job-hunt-simulator/static/js/787.7b45d567.chunk.js",
     "index.html": "/job-hunt-simulator/index.html",
-    "main.da5247bd.css.map": "/job-hunt-simulator/static/css/main.da5247bd.css.map",
-    "main.99225d72.js.map": "/job-hunt-simulator/static/js/main.99225d72.js.map",
+    "main.f58ff474.css.map": "/job-hunt-simulator/static/css/main.f58ff474.css.map",
+    "main.f9e9416e.js.map": "/job-hunt-simulator/static/js/main.f9e9416e.js.map",
     "787.7b45d567.chunk.js.map": "/job-hunt-simulator/static/js/787.7b45d567.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.da5247bd.css",
-    "static/js/main.99225d72.js"
+    "static/css/main.f58ff474.css",
+    "static/js/main.f9e9416e.js"
   ]
 }
