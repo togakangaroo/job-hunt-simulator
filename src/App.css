@@ -50,3 +50,7 @@ header {
     font-size: 1.2rem;
     margin: 10px 0 10px 0;
 }
+.graph-horizontal-bar {
+    height: 10px;
+    background-color: #43b7ce;
+}

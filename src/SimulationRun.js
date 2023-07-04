@@ -2,8 +2,13 @@ import React, { useState, useEffect } from "react"
 import { mean, runSingleJobHuntSimulation, singleJobApplication, runSimulationChains } from "./analysis.js"
 import { period, simulationCount } from "./constants.js"
 
+const HorizontalBar = ({width}) => (
+  <div class="graph-horizontal-bar" style={{width: `${width}%`}} />
+)
+
 export const SimulationRun = ({ parameters }) => {
   const [simulationResults, setSimulationResults] = useState(null)
+
   useEffect(() => {
     const handle = setTimeout(() => {
       const results = Array.from(
@@ -21,13 +26,19 @@ export const SimulationRun = ({ parameters }) => {
     }, 500) //debounce by 500ms
     return () => clearTimeout(handle)
   }, [parameters])
+
+  const pcnt = val => !simulationResults || !simulationResults.meanTotalApplications ? null : (100.0 * val)/simulationResults.meanTotalApplications
+
   return (
     <article className="simulation-run">
       <header>Simulation Results</header>
       {!simulationResults ? null : (
         <dl className="simulation-results">
-          <dd>Mean {period}s in job hunt</dd>
-          <dt>{simulationResults.meanPeriodsToEnd.toFixed(2)}</dt>
+          <dd>Mean {period}s in job hunt
+          </dd>
+          <dt>
+            {simulationResults.meanPeriodsToEnd.toFixed(2)}
+          </dt>
           <dd>Mean total applications</dd>
           <dt>{simulationResults.meanTotalApplications.toFixed(2)}</dt>
           <dd>Mean total offers</dd>
@@ -37,7 +48,10 @@ export const SimulationRun = ({ parameters }) => {
             <dl className="simulation-rejections-by-reason">
               {simulationResults.meanRejectionsByReason.map(([reason, count]) => (
                 <React.Fragment key={reason}>
-                  <dd>{reason}</dd>
+                  <dd>
+                    <div>{reason}</div>
+                    <HorizontalBar width={pcnt(count)}/>
+                  </dd>
                   <dt>{count.toFixed(2)}</dt>
                 </React.Fragment>
               ))}
