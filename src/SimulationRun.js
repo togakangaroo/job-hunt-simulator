@@ -3,7 +3,7 @@ import { mean, runSingleJobHuntSimulation, singleJobApplication, runSimulationCh
 import { period, simulationCount } from "./constants.js"
 
 const HorizontalBar = ({width}) => (
-  <div class="graph-horizontal-bar" style={{width: `${width}%`}} />
+  <div className="graph-horizontal-bar" style={{width: `${width}%`}} />
 )
 
 export const SimulationRun = ({ parameters }) => {
@@ -18,7 +18,7 @@ export const SimulationRun = ({ parameters }) => {
       const meanTotalApplications = mean(results.map((x) => x.totalApplications))
       const allRejectionReasons = new Set(results.map((x) => x.unsuccesfulCountsByReason.keys()).flatMap((x) => Array.from(x)))
       const meanTotalOffers = mean(results.map((x) => x.allOffers.size))
-      const meanRejectionsByReason = Array.from(allRejectionReasons.values()).map((reason) => [
+      const meanRejectionsByReason = Array.from(allRejectionReasons.values()).sort().map((reason) => [
         reason,
         mean(results.map((x) => x.unsuccesfulCountsByReason.get(reason) || 0)),
       ])

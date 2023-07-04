@@ -1,4 +1,10 @@
-const changeNumber = (onChange) => (e) => onChange({ value: parseFloat(e.target.value) })
+const changeNumber =
+  (onChange, propertyName = `value`, additionalProps = {}) =>
+  (e) => {
+    const val = parseFloat(e.target.value)
+    if (!isNaN(val)) onChange({ [propertyName]: val, ...additionalProps })
+  }
+
 export const BinomialParameter = ({ name, value, onChange, description, min = 0.05, max = 0.95, step = 0.05 }) => {
   const inputArguments = { value, min, max, step, onChange: changeNumber(onChange) }
   return (
@@ -48,8 +54,8 @@ export const ConstantParameter = ({ name, value, onChange, description, max, min
 }
 
 export const NormalParameter = ({ name, onChange, mean, stddev, description }) => {
-  const meanInputArguments = { value: mean, min: 0.05, max: 0.95, step: 0.05, onChange: changeNumber(onChange) }
-  const stddevInputArguments = { value: stddev, min: 0, max: 1, step: 0.05, onChange: changeNumber(onChange) }
+  const meanInputArguments = { value: mean, min: 0.05, max: 0.95, step: 0.05, onChange: changeNumber(onChange, `mean`, { stddev }) }
+  const stddevInputArguments = { value: stddev, min: 0, max: 1, step: 0.05, onChange: changeNumber(onChange, `stddev`, { mean }) }
   return (
     <section>
       <header>{name}</header>

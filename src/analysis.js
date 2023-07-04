@@ -52,7 +52,7 @@ export const singleJobApplication = function* ({
       )
     // select the number of people who applied and the number that are going to progress
     const barForResumeSelection = 1 - (1.0 * apply_numberOfApplicantsToMoveOn()) / apply_numberOfApplicants()
-    // cdonsider if the applicant's resume is selected in that number
+    // consider if the applicant's resume is selected in that number
     const quality = apply_resumeQuality()
     if (quality < barForResumeSelection) return singleJobApplicationResult(unsuccessfulOutcome, `1: Resume was not selected for stage 2`)
   }
