@@ -6,6 +6,7 @@
   "dependencies": {
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "file-saver": "^2.0.5",
     "immer": "^10.0.2",
     "random": "^4.1.0",
     "react": "^18.2.0",
