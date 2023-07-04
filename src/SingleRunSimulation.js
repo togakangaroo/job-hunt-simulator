@@ -8,7 +8,7 @@ export const SingleRunSimulation = ({ parameters }) => {
     <article className="single-run-simulation">
       <header>Sample single job hunt simulation.</header>
       <p>
-        The job hunt took {periods.length} {`${period}s`}. Ultimately receiving {offerCount} offers.
+        This job hunt took {periods.length} {`${period}s`}. Ultimately receiving {offerCount} offers.
       </p>
       <ul>
         {periods.map(({ unsuccessful, newApplicationCount, stageCounts }, period) => (

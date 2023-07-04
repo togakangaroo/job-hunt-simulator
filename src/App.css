@@ -1,65 +1,87 @@
 .App {
-    display: grid;
-    grid-template-areas:
-        " header      header    "
-        " parameters  simulation";
-    grid-gap: 20px;
-    height: 100vh;
+  display: grid;
+  grid-template-areas:
+    " header      header    "
+    " parameters  simulation";
+  grid-gap: 20px;
+  height: 100vh;
 }
-.simulation-description {
-    grid-area: header;
+.simulation-info {
+  grid-area: header;
+  padding: 0 20px;
 }
 .parameter-configuration {
-    grid-area: parameters;
-    overflow-y: auto;
+  grid-area: parameters;
+  overflow-y: auto;
+  padding: 0 0 0 20px;
 }
 .simulation-results {
-    grid-area: simulation;
-    overflow-y: auto;
+  grid-area: simulation;
+  overflow-y: auto;
 }
 .simulation-run {
-    border-bottom: 1px dashed grey;
-    padding-bottom: 10px;
+  border-bottom: 1px dashed grey;
+  padding-bottom: 10px;
 }
 
 ul {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 li {
-    margin: 0 0 5px 0;
-    padding: 0 0 5px 0;
-    list-style: none;
-    border-bottom: 1px solid grey;
+  margin: 0 0 5px 0;
+  padding: 0 0 5px 0;
+  list-style: none;
+  border-bottom: 1px solid grey;
 }
 dl {
-    display: grid;
-    grid-template-columns: min-content 1fr;
-    grid-gap: 10px;
-    margin: 0;
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  grid-gap: 10px;
+  margin: 0;
 }
 dd {
-    margin: 0;
+  margin: 0;
 }
 .simulation-rejections-by-reason {
-    grid-template-columns: 1fr min-content;
+  grid-template-columns: 1fr min-content;
 }
 .simulation-rejections-by-reason > dd {
-    position: relative;
+  position: relative;
 }
 
 header {
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin: 10px 0 10px 0;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin: 10px 0 10px 0;
 }
 .graph-horizontal-bar {
-    top: 0px;
-    bottom: 0px;
-    height: 100%;
-    background-color: rgba(70, 180, 200, 0.4);
-    position: absolute;
-    z-index: -1;
-    transition-property: width;
-    transition-duration: 0.3s;
+  top: 0px;
+  bottom: 0px;
+  height: 100%;
+  background-color: rgba(70, 180, 200, 0.4);
+  position: absolute;
+  z-index: -1;
+  transition-property: width;
+  transition-duration: 0.3s;
+}
+.simulation-info > label {
+  cursor: pointer;
+  color: #666;
+  text-align: center;
+  display: block;
+  font-size: 90%;
+}
+#show-more-simulation-info {
+  display: none;
+}
+
+#show-more-simulation-info + * {
+  max-height: 100px;
+  overflow-y: hidden;
+  border-bottom: 1px solid #aaa;
+}
+#show-more-simulation-info:checked + * {
+  max-height: none;
+  border-bottom: 0;
 }
