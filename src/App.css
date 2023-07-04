@@ -60,4 +60,6 @@ header {
     background-color: rgba(70, 180, 200, 0.4);
     position: absolute;
     z-index: -1;
+    transition-property: width;
+    transition-duration: 0.3s;
 }
