@@ -41,8 +41,11 @@ dl {
 dd {
     margin: 0;
 }
-dl.simulation-rejections-by-reason {
-    grid-template-columns: 1fr min-content
+.simulation-rejections-by-reason {
+    grid-template-columns: 1fr min-content;
+}
+.simulation-rejections-by-reason > dd {
+    position: relative;
 }
 
 header {
@@ -51,6 +54,10 @@ header {
     margin: 10px 0 10px 0;
 }
 .graph-horizontal-bar {
-    height: 10px;
-    background-color: #43b7ce;
+    top: 0px;
+    bottom: 0px;
+    height: 100%;
+    background-color: rgba(70, 180, 200, 0.4);
+    position: absolute;
+    z-index: -1;
 }
