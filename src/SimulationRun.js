@@ -10,7 +10,9 @@ const deferRunning = (fn) => {
   return () => clearTimeout(handle)
 }
 
+// Break down simulation and run it in groups, passing back accumulated results as they are ready. This is helpful for when the number of iterations to run is high or the computer is slow. Plus you get a cool effect of the results "honing in" on a value.
 const runSimulationInGroups = (parameters, numberOfSimulationsToRun, setSimulationResultsAndCount) => () => {
+  // TODO - Rewrite this as an async iterator to get rid of the need for any react-isms at all
   const _runSingleJobHuntSimulation = () => runSingleJobHuntSimulation(parameters, () => singleJobApplication(parameters))
   const simulationsIterator = runSimulationChains(numberOfSimulationsToRun, _runSingleJobHuntSimulation)[Symbol.iterator]()
   let cancelNextRun = null
@@ -33,13 +35,24 @@ const runSimulationInGroups = (parameters, numberOfSimulationsToRun, setSimulati
     const meanTotalApplications = addProportion(prevResults?.meanTotalApplications, mean(simulationGroupResults.map((x) => x.totalApplications)))
     const meanTotalOffers = addProportion(prevResults?.meanTotalOffers, mean(simulationGroupResults.map((x) => x.allOffers.size)))
 
-    const allRejectionReasons = new Set(simulationGroupResults?.map((x) => x.unsuccesfulCountsByReason.keys()).flatMap((x) => Array.from(x)) || [])
-    const meanRejectionsByReason = Array.from(allRejectionReasons.values())
-      .sort()
-      .map((reason) => [reason, mean(simulationGroupResults.map((x) => x.unsuccesfulCountsByReason.get(reason) || 0))])
+    const allRejectionReasons = new Set([
+      ...(simulationGroupResults.map((x) => x.unsuccesfulCountsByReason.keys()).flatMap((x) => Array.from(x)) || []),
+      ...Object.keys(prevResults?.meanRejectionsByReason || {}),
+    ])
+    const meanRejectionsByReason = Object.fromEntries(
+      Array.from(allRejectionReasons.values())
+        .sort()
+        .map((reason) => [
+          reason,
+          addProportion(
+            prevResults?.meanRejectionsByReason[reason],
+            mean(simulationGroupResults.map((x) => x.unsuccesfulCountsByReason.get(reason) || 0))
+          ),
+        ])
+    )
 
     simulationGroupResults = []
-    prevResults = { meanPeriodsToEnd, meanTotalApplications, meanTotalOffers, meanRejectionsByReason: [] }
+    prevResults = { meanPeriodsToEnd, meanTotalApplications, meanTotalOffers, meanRejectionsByReason }
     prevResultsCount = nextResultsCount
     setSimulationResultsAndCount([prevResults, prevResultsCount])
     if (!stopProcessing) cancelNextRun = deferRunning(runNextSimulationGroup)
@@ -78,7 +91,7 @@ export const SimulationRun = ({ parameters: originalParameters }) => {
           <dd>Mean Rejections by Reason</dd>
           <dt>
             <dl className="simulation-rejections-by-reason">
-              {simulationResults.meanRejectionsByReason.map(([reason, count]) => (
+              {Object.entries(simulationResults.meanRejectionsByReason).map(([reason, count]) => (
                 <React.Fragment key={reason}>
                   <dd>
                     <div>{reason}</div>
