@@ -16,7 +16,7 @@ describe(`run simulation`, () => {
     screening_phoneScreenPassed: random.binomial(1, 0.5),
     interview1_passed: random.binomial(1, 0.5),
     interview2_passed: random.binomial(1, 0.3),
-    interview3_passed: random.binomial(1, 0.7),
+    interview3_passed: random.binomial(1, 0.3),
     offer_offerReceivedVersusOthers: random.binomial(1, 0.5),
     offer_isGood: random.binomial(1, 0.8),
     general_positionDisappears: random.binomial(1, 0.05), // will be tested multiple times
