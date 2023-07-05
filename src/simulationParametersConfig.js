@@ -90,7 +90,7 @@ export const simulationParametersConfig = {
     fn: (x) => compose(random.poisson(x.value), (n) => n + 1),
     component: PoissonParameter,
     defaultArgs: { value: 1 },
-    componentArgs: { min: 0.5, max: 2, step: 0.1 },
+    componentArgs: { min: 0.5, max: 4, step: 0.1 },
     description: `Companies handle resumes at different paces. This is an estimate of how many ${period}s a company will take to move you to the next stage.`,
   },
   general_positionDisappears: {
