@@ -10,10 +10,8 @@ const changeNumber =
 export const BinomialParameter = ({ name, value, onChange, description, min = 0.05, max = 0.95, step = 0.05 }) => {
   const inputArguments = { value, min, max, step, onChange: changeNumber(onChange) }
   return (
-    <section>
-      <header>
-        <p>{name}</p>
-      </header>
+    <section className="simulation-parameter-config">
+      <header className="simulation-parameter-name">{name}</header>
       <label>
         <div className="label">{description}</div>
         <input type="range" {...inputArguments} />
@@ -26,10 +24,8 @@ export const BinomialParameter = ({ name, value, onChange, description, min = 0.
 export const PoissonParameter = ({ name, value, onChange, description, max, min = 1, step = 1 }) => {
   const inputArguments = { value, min, max, step, onChange: changeNumber(onChange) }
   return (
-    <section>
-      <header>
-        <p>{name}</p>
-      </header>
+    <section className="simulation-parameter-config">
+      <header className="simulation-parameter-name">{name}</header>
       <label>
         <div className="label">{description}</div>
         <input type="range" {...inputArguments} />
@@ -42,10 +38,8 @@ export const PoissonParameter = ({ name, value, onChange, description, max, min 
 export const ConstantParameter = ({ name, value, onChange, description, max, min = 1, step = 1 }) => {
   const inputArguments = { value, min, max, step, onChange: changeNumber(onChange) }
   return (
-    <section>
-      <header>
-        <p>{name}</p>
-      </header>
+    <section className="simulation-parameter-config">
+      <header className="simulation-parameter-name">{name}</header>
       <label>
         <div className="label">{description}</div>
         <input type="range" {...inputArguments} />
@@ -59,8 +53,8 @@ export const NormalParameter = ({ name, onChange, mean, stddev, description }) =
   const meanInputArguments = { value: mean, min: 0.05, max: 0.95, step: 0.05, onChange: changeNumber(onChange, `mean`, { stddev }) }
   const stddevInputArguments = { value: stddev, min: 0, max: 1, step: 0.05, onChange: changeNumber(onChange, `stddev`, { mean }) }
   return (
-    <section>
-      <header>{name}</header>
+    <section className="simulation-parameter-config">
+      <header className="simulation-parameter-name">{name}</header>
       <p>{description}</p>
       <label>
         <div className="label">{name} - Mean</div>
