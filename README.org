@@ -2,6 +2,39 @@
 
 A very simple job hunt simulator to pair with a talk I'm giving on the same subject.
 
+* Getting starated
+
+To isntall dependencies
+#+begin_src shell :eval no
+  npm ci
+#+end_src
+
+Yes, `ci`, not `install`. `npm install` is usually the wrong thing to do, you want to install from the lock file.
+
+* Tests
+
+Tests can be run with
+
+#+begin_src shell :eval no
+  npm test
+#+end_src
+
+Note that currently the tests are more exploratory in nature than anything that asserts errors.
+
+I recommend instaling [[https://github.com/watchexec/watchexec][watchexec]] and running this in a shell to get a heads up display of how simulations run while coding.
+
+#+begin_src shell :eval no
+  watchexec -r -e js -- 'while true; do npm test; sleep 10; done'
+#+end_src
+
+* Deploy
+
+We deploy using [[https://www.npmjs.com/package/gh-pages][gh-pages]]. Deploy to your account with
+
+#+begin_src shell :eval no
+  npm run deploy
+#+end_src
+
 * Brainstorming
 We're going to break down the job hunt into multiple steps and preform a very basic monte carlo simulation to demonstrate the relative value of where to invest your time at improving.
 
@@ -44,68 +77,3 @@ I'm going to start by breaking things down into phases and thinking of the proba
 - Likelihood of being selected versus others? binomial
 - Likelihood the position disappears (position filled, frozen, re-org, ball dropped, etc)
 - Likelihood of taking an offer? binomial
-
-*** AI
-#+begin_ai :model gpt-4
-[SYS]: You are an expert in statistics, data science, reactjs and programming. Give answers in code when appropriate. Prefer functional programming techniques and generator functions. Assume we are going to be running all code in a web browser with javascript. Feel free to use libraries off of npm.
-[ME]: Create a reactjs function component that will allow a user to download a value to a file as json and to load it. The interface should look like this:
-```
-const SaveParameters = ({parameters, setParameters}) => {
-}
-```
-It should have a button. When it is pressed, `JSON.stringify(parameters)` will be downloaded to the user as a json file. It will also have a file upload. When a json file is selected for it it will do `JSON.parse` of its contents and call `setParametsrs` with the result
-[AI]:
-Firstly, you need to install `file-saver` in your project for saving files on the client-side.
-
-You can install the package by running:
-
-```bash
-npm install file-saver --save 
-```
-
-Then, here is the ReactJS component that matches your specifications:
-
-```jsx
-import React from 'react';
-import { saveAs } from 'file-saver';
-
-const SaveParameters = ({parameters, setParameters}) => {
-  // download parameters as a json file
-  const handleDownload = () => {
-    const blob = new Blob([JSON.stringify(parameters)], {type: "application/json;charset=utf-8"});
-    saveAs(blob, 'parameters.json');
-  }
-
-  // parse the uploaded json file and update parameters
-  const handleUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const jsonObj = JSON.parse(event.target.result);
-        setParameters(jsonObj);
-      };
-      reader.readAsText(file);
-    }
-  };
-
-  return (
-    <div>
-      <button onClick={handleDownload}>Download Parameters</button>
-      <input type='file' accept='.json' onChange={handleUpload} />
-    </div>
-  );
-}
-
-export default SaveParameters;
-```
-
-In this code:
-
-- `handleDownload` creates a Blob from parameters, then triggers a download prompt to save it as a JSON file.
-- `handleUpload` reads an uploaded JSON file, then parse it into a JavaScript object and updates parameters by calling `setParameters`.
-
-Make sure your `parameters` prop is a serializable object, and you have the appropriate permissions to read and write files.
-
-[ME]:  
-#+end_ai
