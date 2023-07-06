@@ -15,7 +15,7 @@ export const BinomialParameter = ({ name, value, onChange, description, min = 0.
       <label>
         <div className="label">{description}</div>
         <input type="range" {...inputArguments} />
-        <input type="number" {...inputArguments} /> (Likelihood of happening)
+        <input type="number" {...inputArguments} /> (0 - next to no chance, 1 - almost certain)
       </label>
     </section>
   )
@@ -29,7 +29,7 @@ export const PoissonParameter = ({ name, value, onChange, description, max, min 
       <label>
         <div className="label">{description}</div>
         <input type="range" {...inputArguments} />
-        <input type="number" {...inputArguments} /> (λ parameter in a Poisson distribution)
+        <input type="number" {...inputArguments} /> (λ parameter in a Poisson distribution - value used will be about this amount)
       </label>
     </section>
   )
@@ -64,7 +64,7 @@ export const NormalParameter = ({ name, onChange, mean, stddev, description }) =
       <label>
         <div className="label">{name} - Standard Deviation</div>
         <input type="range" {...stddevInputArguments} />
-        <input type="number" {...stddevInputArguments} />
+        <input type="number" {...stddevInputArguments} /> (60% of the time value will be within 1 devation of the mean, 95% within 2)
       </label>
     </section>
   )
