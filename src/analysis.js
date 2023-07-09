@@ -140,7 +140,8 @@ export const runSingleJobHuntSimulation = function* (jobHuntParameters, startJob
   let offerCount = 0
   const desiredOfferCount = jobHuntParameters.desiredOfferCount()
 
-  for (const [_, period] of zip(Array(maxPeriods).fill(0), jobHuntSimulation(jobHuntParameters, startJobApplication))) {
+  // eslint-disable-next-line no-unused-vars
+  for (const [_x, period] of zip(Array(maxPeriods).fill(0), jobHuntSimulation(jobHuntParameters, startJobApplication))) {
     yield period
     offerCount += period.offers.size
     if (desiredOfferCount <= offerCount) break

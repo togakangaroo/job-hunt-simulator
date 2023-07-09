@@ -60,6 +60,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/register": "^7.22.5",
     "gh-pages": "^5.0.0",
     "mocha": "^10.2.0"
