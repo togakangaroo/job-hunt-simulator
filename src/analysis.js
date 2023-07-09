@@ -19,6 +19,16 @@ export const mean = (vals) => {
   return sum / count
 }
 
+export const zip = function* (...iterables) {
+  if (!iterables.length) return
+  const iterators = iterables.map((x) => x[Symbol.iterator]())
+  while (true) {
+    const nextVals = iterators.map((it) => it.next())
+    if (nextVals.some((x) => x.done)) return
+    yield nextVals.map((x) => x.value)
+  }
+}
+
 const unsuccessfulOutcome = Symbol(`Job application outcome - unsuccessful`)
 const successfulOutcome = Symbol(`Job application outcome - successful`)
 
@@ -123,17 +133,21 @@ export const jobHuntSimulation = function* ({ numberOfApplicationsPerPeriod, tak
   }
 }
 
+export const maxPeriods = 52 * 4
+
 // Similar to jobHuntSimulation but stop the generator once the requisite number of offers is reached
 export const runSingleJobHuntSimulation = function* (jobHuntParameters, startJobApplication) {
   let offerCount = 0
   const desiredOfferCount = jobHuntParameters.desiredOfferCount()
 
-  for (const period of jobHuntSimulation(jobHuntParameters, startJobApplication)) {
+  for (const [_, period] of zip(Array(maxPeriods).fill(0), jobHuntSimulation(jobHuntParameters, startJobApplication))) {
     yield period
     offerCount += period.offers.size
-    if (desiredOfferCount <= offerCount) return { offerCount }
+    if (desiredOfferCount <= offerCount) break
   }
+  return { offerCount }
 }
+
 // Simulate a set of simulation chains and report an all their results. Yields on the result of each chain.
 export const runSimulationChains = function* (simulationCount, runSimulation) {
   for (let i = 0; i < simulationCount; i += 1) {
