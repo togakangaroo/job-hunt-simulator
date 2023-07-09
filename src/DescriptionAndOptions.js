@@ -21,7 +21,7 @@ export const DescriptionAndOptions = ({ parameters, setParameters }) => {
           time tweaking your resume versus spending time on interview prep, this is intended to give you an intuitive understanding of relative
           impact.
         </p>
-        <p>Note that to prevent crashes, all simulations are capped at {maxPeriods} weeks.</p>
+        <p>Note that to prevent crashes, all simulations are capped at {maxPeriods} weeks. If your mean-number-of-offers is significantly worse than what you set your desired amount to be, that means some simulations are regularly reaching this cap with no offers.</p>
         <p>
           <a href="https://github.com/togakangaroo/job-hunt-simulator">Repository here.</a> Pull requests to redo my likely-bad data science are very
           welcome.
