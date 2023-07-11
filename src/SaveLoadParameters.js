@@ -1,8 +1,8 @@
 import { saveAs } from "file-saver"
 import { useParameterConfigurationValues } from "./useParameterConfigurationValues.js"
 
-export const SaveLoadParameters = ({}) => {
-  const [parameterConfigurationValues, setParameterConfigurationValues] = useParameterConfigurationValues()
+export const SaveLoadParameters = () => {
+  const [parameterConfigurationValues, setParameterConfigurationValues, resetParameterConfigurationValues] = useParameterConfigurationValues()
 
   const handleDownload = () => {
     const blob = new Blob([JSON.stringify(parameterConfigurationValues, null, 2)], { type: "application/json;charset=utf-8" })
@@ -24,8 +24,9 @@ export const SaveLoadParameters = ({}) => {
   return (
     <section className="save-load-parameters">
       <header>Save or parameters from a file</header>
+      <button onClick={resetParameterConfigurationValues}>Reset Parameters</button>
       <button onClick={handleDownload}>Download Parameters</button>
-      <input type="file" accept=".json" onChange={handleUpload} />
+      Bookmark the url or load a previously saved file: <input type="file" accept=".json" onChange={handleUpload} />
     </section>
   )
 }

@@ -7,25 +7,28 @@ const defaultParameterConfigurationValues = mapValues(simulationParametersConfig
 export const useParameterConfigurationValues = () => {
   const [searchParams, setSearchParams] = useSearchParams()
 
+  const explicitlySetParameterConfigurationValues = mapValues(Object.fromEntries(searchParams), (_, name) => {
+    const str = searchParams.get(name)
+    if (str === null) return defaultParameterConfigurationValues[name]
+    try {
+      return JSON.parse(str)
+    } catch {
+      return defaultParameterConfigurationValues[name]
+    }
+  })
+
   const paramterConfigurationValues = {
     ...defaultParameterConfigurationValues,
-    ...mapValues(simulationParametersConfig, (_, name) => {
-      const str = searchParams.get(name)
-      if (str === null) return defaultParameterConfigurationValues[name]
-
-      try {
-        return JSON.parse(str)
-      } catch {
-        return defaultParameterConfigurationValues[name]
-      }
-    }),
+    ...explicitlySetParameterConfigurationValues,
   }
   // Note that this will only set parameter configuration values which have been modified from their initial values.
   const setParamterConfigurationValues = (pcv) =>
-    setSearchParams((prevSearchParams) => ({
-      ...prevSearchParams,
+    setSearchParams({
+      ...Object.fromEntries(searchParams),
       ...mapValues(pcv || {}, (x) => JSON.stringify(x)),
-    }))
+    })
 
-  return [paramterConfigurationValues, setParamterConfigurationValues]
+  const resetParameterConfigurationValues = () => setSearchParams({})
+
+  return [paramterConfigurationValues, setParamterConfigurationValues, resetParameterConfigurationValues]
 }
