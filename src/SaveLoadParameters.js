@@ -1,15 +1,22 @@
 import { saveAs } from "file-saver"
+import { useParameterConfigurationValues } from "./useParameterConfigurationValues.js"
 
-export const SaveLoadParameters = ({ parameters, setParameters }) => {
+export const SaveLoadParameters = ({}) => {
+  const [parameterConfigurationValues, setParameterConfigurationValues] = useParameterConfigurationValues()
+
   const handleDownload = () => {
-    const blob = new Blob([JSON.stringify(parameters, null, 2)], { type: "application/json;charset=utf-8" })
+    const blob = new Blob([JSON.stringify(parameterConfigurationValues, null, 2)], { type: "application/json;charset=utf-8" })
     saveAs(blob, "parameters.json")
   }
 
-  const handleUpload = ({target: {files: [file]}}) => {
+  const handleUpload = ({
+    target: {
+      files: [file],
+    },
+  }) => {
     if (file) {
       const reader = new FileReader()
-      reader.onload = ({target: {result}}) => setParameters(JSON.parse(result))
+      reader.onload = ({ target: { result } }) => setParameterConfigurationValues(JSON.parse(result))
       reader.readAsText(file)
     }
   }

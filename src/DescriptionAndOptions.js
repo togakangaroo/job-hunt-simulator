@@ -4,7 +4,7 @@ import { SaveLoadParameters } from "./SaveLoadParameters.js"
 import { maxPeriods } from "./analysis.js"
 import "./App.css"
 
-export const DescriptionAndOptions = ({ parameters, setParameters }) => {
+export const DescriptionAndOptions = () => {
   const [showMore, setShowMore] = useState(false)
   return (
     <section className="simulation-info">
@@ -21,12 +21,15 @@ export const DescriptionAndOptions = ({ parameters, setParameters }) => {
           time tweaking your resume versus spending time on interview prep, this is intended to give you an intuitive understanding of relative
           impact.
         </p>
-        <p>Note that to prevent crashes, all simulations are capped at {maxPeriods} weeks. If your mean-number-of-offers is significantly worse than what you set your desired amount to be, that means some simulations are regularly reaching this cap with no offers.</p>
+        <p>
+          Note that to prevent crashes, all simulations are capped at {maxPeriods} weeks. If your mean-number-of-offers is significantly worse than
+          what you set your desired amount to be, that means some simulations are regularly reaching this cap with no offers.
+        </p>
         <p>
           <a href="https://github.com/togakangaroo/job-hunt-simulator">Repository here.</a> Pull requests to redo my likely-bad data science are very
           welcome.
         </p>
-        <SaveLoadParameters parameters={parameters} setParameters={setParameters} />
+        <SaveLoadParameters />
       </div>
       <label htmlFor="show-more-simulation-info">{showMore ? `∧ Show Less ∧` : `∨ Show More ∨`}</label>
     </section>
