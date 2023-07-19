@@ -49,7 +49,7 @@ export const ConstantParameter = ({ name, value, onChange, description, max, min
 
 export const NormalParameter = ({ name, onChange, mean, stddev, description }) => {
   const meanInputArguments = { value: mean, min: 0.05, max: 0.95, step: 0.05, onChange: changeNumber(onChange, (mean) => ({ mean, stddev })) }
-  const stddevInputArguments = { value: stddev, min: 0, max: 1, step: 0.05, onChange: changeNumber(onChange, stddev, { mean, stddev }) }
+  const stddevInputArguments = { value: stddev, min: 0, max: 1, step: 0.05, onChange: changeNumber(onChange, (stddev) => ({ mean, stddev })) }
   return (
     <section className="simulation-parameter-config">
       <header className="simulation-parameter-name">{name}</header>
