@@ -64,14 +64,14 @@ export const singleJobApplication = function* ({
     const barForResumeSelection = 1 - (1.0 * apply_numberOfApplicantsToMoveOn()) / apply_numberOfApplicants()
     // consider if the applicant's resume is selected in that number
     const quality = apply_resumeQuality()
-    if (quality < barForResumeSelection) return singleJobApplicationResult(unsuccessfulOutcome, `1: Resume was not selected for stage 2`)
+    if (quality < barForResumeSelection) return singleJobApplicationResult(unsuccessfulOutcome, `1: Resume was not selected`)
   }
   {
     const stage = atStage(2, `Phone screen`)
     for (let i = 0; i < periodsPerStage; i += 1) yield stage
     if (general_positionDisappears())
       return singleJobApplicationResult(unsuccessfulOutcome, `2: The job has disappeared, been frozen, or the hiring pipeline broke.`)
-    if (!screening_phoneScreenPassed()) return singleJobApplicationResult(unsuccessfulOutcome, `2: Failed the job screen`)
+    if (!screening_phoneScreenPassed()) return singleJobApplicationResult(unsuccessfulOutcome, `2: Failed the phone screen`)
   }
   {
     const stage = atStage(3, `Iterview 1`)
