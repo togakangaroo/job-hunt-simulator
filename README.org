@@ -2,7 +2,7 @@
 
 A very simple job hunt simulator to pair with a talk I'm giving on the same subject.
 
-* Getting starated
+* Getting started
 
 To isntall dependencies
 #+begin_src shell :eval no
